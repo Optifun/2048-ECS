@@ -9,48 +9,48 @@ public class PlayerInputs : MonoBehaviour
     Vector2Int endMousePosition = Vector2Int.zero;
     Vector2Int moveDirection = Vector2Int.zero;
 
-    event UIDirectionHint;
-    event GameMoveDirection;
+    //event UIDirectionHint;
+    //event GameMoveDirection;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        Field.instance.StartGame();
     }
 
     private void OnMouseDown()
     {
-        startMousePosition = Input.mousePosition;
+        //startMousePosition = Input.mousePosition;
         //event для UI (о том, что нужно показать подсказку)
     }
 
     private void OnMouseDrag()
     {
-        dragMousePosition = Input.mousePosition;
+        //dragMousePosition = Input.mousePosition;
         //event для UI (о том, что мышь была сдвинута и нужно пересчитать позицию)
     }
 
     private void OnMouseUp()
     {
-        endMousePosition = Input.mousePosition;
+        //endMousePosition = Input.mousePosition;
         //event для UI (о том, чтобы отключить подсказку) и игры (о направлении передвижения)
     }
 
-    private Vector2 GetMoveDirectionFromKeyboard()
+    private Vector2Int GetMoveDirectionFromKeyboard()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow))
         {
             return Vector2Int.up;
         }
-        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow))
         {
             return Vector2Int.left;
         }
-        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        else if (Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.DownArrow))
         {
             return Vector2Int.down;
         }
-        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        else if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow))
         {
             return Vector2Int.right;
         }
@@ -63,9 +63,11 @@ public class PlayerInputs : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GetMoveDirectionFromKeyboard() != Vector2.zero)
+        moveDirection = GetMoveDirectionFromKeyboard();
+        if (moveDirection != Vector2Int.zero)
         {
             // event для игры (о направлении передвижения)
+            Field.instance.Move(moveDirection);
         }
 
     }

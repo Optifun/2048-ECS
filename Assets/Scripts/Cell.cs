@@ -4,7 +4,15 @@ using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
-    GameObject tile = null;
+    public Tile tile { get; set; }
+    public Vector2Int position { get; private set; }
+
+    public void Initialize(Vector2Int _position)
+    {
+        tile = null;
+        position = _position;
+        this.gameObject.name = $"Cell ({position.x},{position.y})";
+    }
 
     public bool isFree()
     {
@@ -18,10 +26,15 @@ public class Cell : MonoBehaviour
         }
     }
 
+    public void Clear()
+    {
+        tile = null;
+    }
+    
     // Start is called before the first frame update
     void Start()
     {
-        tile = null;
+        
     }
 
     // Update is called once per frame
