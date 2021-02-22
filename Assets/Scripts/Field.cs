@@ -58,6 +58,7 @@ public class Field : MonoBehaviour
         tileCount = 0;
         //Создается поле 4х4
         CreateField();
+
         if (!LoadGame())
         {
             //Если прошлая игра не смогла загрузиться то, тогда появляется 2 плитки одна из них может принимать значения: 2 либо 4; другая только 2.
@@ -116,8 +117,10 @@ public class Field : MonoBehaviour
 
     public void ResetGame()
     {
+        tileCount = 0;
         ResetField();
-        StartGame();
+        CreateTile();
+        CreateTile();
     }
 
     private void ResetField()
@@ -131,14 +134,13 @@ public class Field : MonoBehaviour
                 if (field[i, j].isFree() == false)
                 {
                     Destroy(field[i, j].tile.gameObject);
+                    field[i, j].Clear();
                 }
 
-                Destroy(field[i, j].gameObject);
                 PlayerPrefs.SetInt($"Cell[{i}, {j}]", -1);
             }
         }
-
-        field = new Cell[4, 4];
+        
         PlayerPrefs.Save();
     }
 
@@ -147,11 +149,14 @@ public class Field : MonoBehaviour
         Vector2Int _tilePosition = new Vector2Int(Random.Range(0, 4), Random.Range(0, 4));
         if (field[_tilePosition.x, _tilePosition.y].isFree())
         {
+            //Vector3 _tileGlobalPosition;
+            //_tileGlobalPosition = new Vector3(field[_tilePosition.x, _tilePosition.y].transform.position.x, field[_tilePosition.x, _tilePosition.y].transform.position.y, -1); 
             Tile _newTile = Instantiate(tilePrefab, field[_tilePosition.x, _tilePosition.y].transform).GetComponent<Tile>();
             _newTile.Initialize(_tilePosition);
 
             field[_tilePosition.x, _tilePosition.y].tile = _newTile;
             _newTile.transform.SetParent(field[_tilePosition.x, _tilePosition.y].transform);
+            //_newTile.transform.localPosition = new Vector3(0, 0 -10);
 
             tileCount++;
         }
@@ -165,11 +170,14 @@ public class Field : MonoBehaviour
     {
         if (field[_position.x, _position.y].isFree())
         {
+            //Vector3 _tileGlobalPosition;
+            //_tileGlobalPosition = new Vector3(field[_position.x, _position.y].transform.position.x, field[_position.x, _position.y].transform.position.y, -10);
             Tile _newTile = Instantiate(tilePrefab, field[_position.x, _position.y].transform).GetComponent<Tile>();
             _newTile.Initialize(_value, _position);
 
             field[_position.x, _position.y].tile = _newTile;
             _newTile.transform.SetParent(field[_position.x, _position.y].transform);
+            //_newTile.transform.localPosition = new Vector3(0, 0, -10);
 
             tileCount++;
         }

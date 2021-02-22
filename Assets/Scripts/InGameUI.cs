@@ -57,6 +57,7 @@ public class InGameUI : MonoBehaviour
     public void Retry()
     {
         ResetUI();
+        StartNewGame();
         Field.instance.ResetGame();
         panel.SetActive(false);
 
@@ -67,18 +68,10 @@ public class InGameUI : MonoBehaviour
     {
         scoreAmount = 0;
         PlayerPrefs.SetInt("Score", -1);
-        bestAmount = 0;
-        bestText.text = "0";
         scoreText.text = scoreAmount.ToString();
     }
 
     public void StartNewGame()
-    {
-        //TODO: start new game
-    }
-
-    // Start is called before the first frame update
-    void Start()
     {
         int amount = PlayerPrefs.GetInt("Best");
         if (amount > 0)
@@ -88,7 +81,7 @@ public class InGameUI : MonoBehaviour
         else
         {
             bestAmount = 0;
-            
+
         }
         bestText.text = bestAmount.ToString();
 
@@ -102,6 +95,12 @@ public class InGameUI : MonoBehaviour
             scoreAmount = 0;
         }
         scoreText.text = scoreAmount.ToString();
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
     }
 
     public void SpawnPopUpText(int _amount)
