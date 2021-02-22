@@ -106,7 +106,9 @@ public class InGameUI : MonoBehaviour
 
     public void SpawnPopUpText(int _amount)
     {
-        PopUp _popUpText = Instantiate(popupTextPrefab, new Vector3(25.71f, 11.822f, 0f), new Quaternion(0, 0, 0, 0)).GetComponent<PopUp>();
+        PopUp _popUpText = Instantiate(popupTextPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)).GetComponent<PopUp>();
+        _popUpText.gameObject.transform.SetParent(scoreText.gameObject.transform);
+        _popUpText.gameObject.transform.localPosition = new Vector3(25f, 9.5f);
         _popUpText.Initialize(_amount);
     }
 

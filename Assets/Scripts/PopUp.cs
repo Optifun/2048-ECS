@@ -10,7 +10,7 @@ public class PopUp : MonoBehaviour
     public void Initialize(int _amount)
     {
         popUpText = this.GetComponent<Text>();
-        popUpText.text = _amount.ToString();
+        popUpText.text = $"+{_amount.ToString()}";
         Destroy(this.gameObject, 2);
     }
 

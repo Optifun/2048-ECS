@@ -47,6 +47,7 @@ public class Field : MonoBehaviour
                 cellPosition = new Vector3((size + indention) * i - centering, (size + indention) * j - centering, 0);
                 field[i, j] = Instantiate(cellPrefab, cellPosition, new Quaternion(0, 0, 0, 0)).GetComponent<Cell>();
                 field[i, j].Initialize(new Vector2Int(i, j));
+                field[i, j].gameObject.transform.SetParent(this.gameObject.transform);
             }
         }
     }
