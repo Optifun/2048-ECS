@@ -17,6 +17,11 @@ public class PowerOfTwo
     }
 }
 
+public enum ResetFieldType
+{
+    retry = 0,
+    returnToLastTurn = 1
+}
 
 public class Field : MonoBehaviour
 {
@@ -24,9 +29,10 @@ public class Field : MonoBehaviour
     public GameObject cellPrefab;
     public GameObject tilePrefab;
     Cell[,] field = new Cell[4, 4];
-    //List<Tile> tiles = new List<Tile>();
 
-    private int tileCount;
+    List<(Vector2Int, int)> lastTurnTiles = new List<(Vector2Int, int)>();
+
+    private int tilesCount;
     private int mergingSummary;
 
     static float size = 2;
@@ -55,7 +61,7 @@ public class Field : MonoBehaviour
     //Функция создает поле и спавнит 2 плитки (начало игры)
     public void StartGame()
     {
-        tileCount = 0;
+        tilesCount = 0;
         //Создается поле 4х4
         CreateField();
 
@@ -117,15 +123,28 @@ public class Field : MonoBehaviour
 
     public void ResetGame()
     {
-        tileCount = 0;
-        ResetField();
-        CreateTile();
-        CreateTile();
+        tilesCount = 0;
+        ResetField(ResetFieldType.retry);
+        //CreateTile();
+        //CreateTile();
+
+        int _val = 1;
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (_val <= 13)
+                    CreateTile(new Vector2Int(i, j), (int)Mathf.Pow(2, _val));
+
+                _val++;
+            }
+        }
     }
 
-    private void ResetField()
+    private void ResetField(ResetFieldType _type)
     {
-        PlayerPrefs.SetInt("GameMode", -1);
+        if (_type == 0)
+            PlayerPrefs.SetInt("GameMode", -1);
 
         for (int i = 0; i < 4; i++)
         {
@@ -144,6 +163,21 @@ public class Field : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    public void ReturnToLastTurn()
+    {
+        ResetField(ResetFieldType.returnToLastTurn);
+
+        foreach (var tile in lastTurnTiles)
+        {
+            CreateTile(tile.Item1, tile.Item2);
+            PlayerPrefs.SetInt($"Cell[{tile.Item1.x}, {tile.Item1.y}]", tile.Item2);
+        }
+
+        tilesCount = lastTurnTiles.Count;
+
+        lastTurnTiles.Clear();
+    }
+
     private void CreateTile()
     {
         Vector2Int _tilePosition = new Vector2Int(Random.Range(0, 4), Random.Range(0, 4));
@@ -158,7 +192,7 @@ public class Field : MonoBehaviour
             _newTile.transform.SetParent(field[_tilePosition.x, _tilePosition.y].transform);
             //_newTile.transform.localPosition = new Vector3(0, 0 -10);
 
-            tileCount++;
+            tilesCount++;
         }
         else
         {
@@ -179,7 +213,7 @@ public class Field : MonoBehaviour
             _newTile.transform.SetParent(field[_position.x, _position.y].transform);
             //_newTile.transform.localPosition = new Vector3(0, 0, -10);
 
-            tileCount++;
+            tilesCount++;
         }
         else
         {
@@ -198,6 +232,7 @@ public class Field : MonoBehaviour
         int _signDirection;
         int j;
 
+        lastTurnTiles.Clear();
         mergingSummary = 0;
 
         if (_direction.x > 0 || _direction.y > 0)
@@ -252,6 +287,8 @@ public class Field : MonoBehaviour
                 */
                 if (_previousCellIndex == -1 && _cells[j].isFree() == false)
                 {
+                    lastTurnTiles.Add((_cells[j].position, _cells[j].tile.value));
+
                     _previousCellIndex = j;
                     _index = MoveTileToAvailableCell(_signDirection, _previousCellIndex, _cells);
 
@@ -267,6 +304,8 @@ public class Field : MonoBehaviour
                     _currentCellIndex = j;
                     if (_cells[_currentCellIndex].isFree() == false)
                     {
+                        lastTurnTiles.Add((_cells[j].position, _cells[j].tile.value));
+
                         if (isMergiable(_currentCellIndex, _previousCellIndex, _cells) == true)
                         {
                             Merge(_signDirection, _previousCellIndex, _currentCellIndex, ref _cells);
@@ -305,10 +344,12 @@ public class Field : MonoBehaviour
             }
 
             //TODO: узнать есть ли какой-то ход для того, чтобы "разрулить" ситуацию
-            if (tileCount == 16)
+            if (tilesCount == 16)
             {
                 InGameUI.instance.GameOver();
             }
+
+            InGameUI.instance.InteractBackArrow();
 
             SaveField();
         }
@@ -407,7 +448,7 @@ public class Field : MonoBehaviour
 
         _mergedTile.Merge();
         _mergeableTile.Merge();
-        tileCount -= 2;
+        tilesCount -= 2;
     }
 
     private void MoveTile(int _from, int _to, ref Cell[] _cells)

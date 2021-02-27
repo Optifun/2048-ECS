@@ -14,6 +14,7 @@ public class InGameUI : MonoBehaviour
     public int bestAmount { get; private set; }
     public GameObject popupTextPrefab;
     public GameObject panel;
+    public Button BackArrow;
 
     Animator panelAnimator;
     Animator scoreAnimator;
@@ -40,6 +41,8 @@ public class InGameUI : MonoBehaviour
 
         PlayerPrefs.SetInt("Score", scoreAmount);
         PlayerPrefs.Save();
+
+        BackArrow.interactable = true;
     }
 
     public void GameOver()
@@ -48,6 +51,7 @@ public class InGameUI : MonoBehaviour
         if (bestAmount < scoreAmount)
         {
             bestAmount = scoreAmount;
+            bestText.text = bestAmount.ToString();
             PlayerPrefs.SetInt("Best", bestAmount);
             PlayerPrefs.Save();
         }
@@ -95,12 +99,14 @@ public class InGameUI : MonoBehaviour
             scoreAmount = 0;
         }
         scoreText.text = scoreAmount.ToString();
+
+        BackArrow.interactable = false;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        StartNewGame();
     }
 
     public void SpawnPopUpText(int _amount)
@@ -109,6 +115,22 @@ public class InGameUI : MonoBehaviour
         _popUpText.gameObject.transform.SetParent(scoreText.gameObject.transform);
         _popUpText.gameObject.transform.localPosition = new Vector3(25f, 9.5f);
         _popUpText.Initialize(_amount);
+    }
+
+    public void ReturnToLastTurn()
+    {
+        Field.instance.ReturnToLastTurn();
+        BackArrow.interactable = false;
+    }
+
+    public void InteractBackArrow()
+    {
+        BackArrow.interactable = true;
+    }
+
+    public void CloseGame()
+    {
+        Application.Quit();
     }
 
     // Update is called once per frame

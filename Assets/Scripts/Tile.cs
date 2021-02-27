@@ -16,6 +16,7 @@ public class Tile : MonoBehaviour
     private Color spriteColor;
 
     public Animator animator;
+
     /*
     public void Merged()
     {
@@ -65,7 +66,7 @@ public class Tile : MonoBehaviour
 
     public void SetAppearance()
     {
-        spriteColor = colorPallete[(int)Mathf.Log(value, 2)];
+        spriteColor = colorPallete[(int)Mathf.Log(value, 2) - 1];
 
         if (spriteColor.grayscale >= 160)
         {
@@ -77,7 +78,6 @@ public class Tile : MonoBehaviour
         }
 
         sprite.color = colorPallete[(int)Mathf.Log(value, 2) - 1];
-        Debug.Log((int)Mathf.Log(value, 2));
         numberText.text = value.ToString();
     }
 
