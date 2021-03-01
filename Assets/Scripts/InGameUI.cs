@@ -39,7 +39,7 @@ public class InGameUI : MonoBehaviour
 
         SpawnPopUpText(_amount);
 
-        PlayerPrefs.SetInt("Score", scoreAmount);
+        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", scoreAmount);
         PlayerPrefs.Save();
 
         BackArrow.interactable = true;
@@ -52,7 +52,7 @@ public class InGameUI : MonoBehaviour
         {
             bestAmount = scoreAmount;
             bestText.text = bestAmount.ToString();
-            PlayerPrefs.SetInt("Best", bestAmount);
+            PlayerPrefs.SetInt($"GameMode {Field.cellCount} Best", bestAmount);
             PlayerPrefs.Save();
         }
         //TODO: transition
@@ -71,13 +71,13 @@ public class InGameUI : MonoBehaviour
     public void ResetUI()
     {
         scoreAmount = 0;
-        PlayerPrefs.SetInt("Score", -1);
+        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", 0);
         scoreText.text = scoreAmount.ToString();
     }
 
     public void StartNewGame()
     {
-        int amount = PlayerPrefs.GetInt("Best");
+        int amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Best");
         if (amount > 0)
         {
             bestAmount = amount;
@@ -89,7 +89,7 @@ public class InGameUI : MonoBehaviour
         }
         bestText.text = bestAmount.ToString();
 
-        amount = PlayerPrefs.GetInt("Score");
+        amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Score");
         if (amount > 0)
         {
             scoreAmount = amount;

@@ -9,13 +9,15 @@ public class PlayerInputs : MonoBehaviour
     Vector2Int endMousePosition = Vector2Int.zero;
     Vector2Int moveDirection = Vector2Int.zero;
 
+    bool isLocked;
+
     //event UIDirectionHint;
     //event GameMoveDirection;
 
     // Start is called before the first frame update
     void Start()
     {
-        Field.instance.StartGame();
+        isLocked = false;
     }
 
     private void OnMouseDown()
@@ -63,11 +65,15 @@ public class PlayerInputs : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        moveDirection = GetMoveDirectionFromKeyboard();
-        if (moveDirection != Vector2Int.zero)
+        if (isLocked == false)
         {
-            // event для игры (о направлении передвижения)
-            Field.instance.Move(moveDirection);
+            moveDirection = GetMoveDirectionFromKeyboard();
+
+            if (moveDirection != Vector2Int.zero)
+            {
+                // event для игры (о направлении передвижения)
+                Field.instance.Move(moveDirection);
+            }
         }
 
     }
