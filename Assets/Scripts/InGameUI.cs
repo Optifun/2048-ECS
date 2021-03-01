@@ -15,6 +15,11 @@ public class InGameUI : MonoBehaviour
     public GameObject popupTextPrefab;
     public GameObject panel;
     public Button BackArrow;
+    public Text fieldNameText;
+    public Button DecreaseCellCountButton;
+    public Button IncreaseCellCountButton;
+
+    private int cellCount = 4;
 
     Animator panelAnimator;
     Animator scoreAnimator;
@@ -101,6 +106,39 @@ public class InGameUI : MonoBehaviour
         scoreText.text = scoreAmount.ToString();
 
         BackArrow.interactable = false;
+    }
+
+    public void IncreaseCellCount()
+    {
+        ChangeField(1);
+        //Invoke GameEnvironment (там увеличивается кол-во клеток в поле и загружается новое поле)
+    }
+
+    public void DecreaseCellCount()
+    {
+        ChangeField(-1);
+        //Invoke GameEnvironment (там увеличивается кол-во клеток в поле и загружается новое поле)
+    }
+
+    public void ChangeField(int _sign)
+    {
+        cellCount += _sign;
+        fieldNameText.text = $"{cellCount}x{cellCount}";
+        Field.instance.SetCellCount(cellCount);
+
+        if (cellCount >= 6)
+        {
+            IncreaseCellCountButton.interactable = false;
+        }
+        else if (cellCount <= 4)
+        {
+            DecreaseCellCountButton.interactable = false;
+        }
+        else
+        {
+            IncreaseCellCountButton.interactable = true;
+            DecreaseCellCountButton.interactable = true;
+        }
     }
 
     // Start is called before the first frame update

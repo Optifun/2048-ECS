@@ -48,6 +48,13 @@ public class Field : MonoBehaviour
     static float fieldsize;
     static float centering;
 
+    public void SetCellCount(int _cellCount)
+    {
+        DestroyField();
+        cellCount = _cellCount;
+        StartGame();
+    }
+
     //Функция создает поле (cellCount) х (cellCount)
     private void CreateField()
     {
@@ -57,10 +64,11 @@ public class Field : MonoBehaviour
         {
             for (int j = 0; j < cellCount; j++)
             {
-                cellPosition = new Vector3((size + indention) * i - centering, (size + indention) * j - centering, 0);
+                cellPosition = new Vector3((size + indention) * i - centering, (size + indention) * j - centering, -1);
                 field[i, j] = Instantiate(cellPrefab, cellPosition, new Quaternion(0, 0, 0, 0)).GetComponent<Cell>();
                 field[i, j].Initialize(new Vector2Int(i, j));
                 field[i, j].gameObject.transform.SetParent(this.gameObject.transform);
+                //field[i, j].transform.localPosition = new Vector3(0, 0, -1);
             }
         }
     }
@@ -68,6 +76,15 @@ public class Field : MonoBehaviour
     //Функция создает поле и спавнит 2 плитки (начало игры)
     public void StartGame()
     {
+        fieldsize = (size * cellCount + indention * (cellCount + 1)) / 2;
+        centering = fieldsize - size / 2 - indention;
+
+        this.gameObject.transform.localScale = new Vector3(fieldsize, fieldsize);
+
+        Camera.main.orthographicSize = camToField * cellCount;
+
+        field = new Cell[cellCount, cellCount];
+
         tilesCount = 0;
         //Создается поле (cellCount) х (cellCount)
         CreateField();
@@ -150,6 +167,17 @@ public class Field : MonoBehaviour
         */
     }
 
+    void DestroyField()
+    {
+        for (int i = 0; i < cellCount; i++)
+        {
+            for (int j = 0; j < cellCount; j++)
+            {
+                Destroy(field[i, j].gameObject);
+            }
+        }
+    }
+
     private void ResetField(ResetFieldType _type)
     {
         if (_type == 0)
@@ -199,7 +227,7 @@ public class Field : MonoBehaviour
 
             field[_tilePosition.x, _tilePosition.y].tile = _newTile;
             _newTile.transform.SetParent(field[_tilePosition.x, _tilePosition.y].transform);
-            //_newTile.transform.localPosition = new Vector3(0, 0 -10);
+            //_newTile.transform.localPosition = new Vector3(0, 0 -1);
 
             tilesCount++;
         }
@@ -552,14 +580,6 @@ public class Field : MonoBehaviour
     {
         cellCount = 4;
 
-        fieldsize = (size * cellCount + indention * (cellCount + 1)) / 2;
-        centering = fieldsize - size / 2 - indention;
-
-        this.gameObject.transform.localScale = new Vector3(fieldsize, fieldsize);
-
-        Camera.main.orthographicSize = camToField * cellCount;
-
-        field = new Cell[cellCount, cellCount];
         StartGame();
     }
 
