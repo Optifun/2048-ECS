@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class PlayerInputs : MonoBehaviour
 {
-    Vector2Int startMousePosition = Vector2Int.zero;
-    Vector2Int dragMousePosition = Vector2Int.zero;
-    Vector2Int endMousePosition = Vector2Int.zero;
+    Vector3 startMousePosition = Vector3.zero;
+    Vector3 dragMousePosition = Vector3.zero;
+    Vector3 endMousePosition = Vector3.zero;
     Vector2Int moveDirection = Vector2Int.zero;
+    float deltaHorizontal;
+    float deltaVertical;
 
     bool isLocked;
+    bool isStartPosition;
+    bool isMovementTriggered;
 
     //event UIDirectionHint;
     //event GameMoveDirection;
@@ -18,16 +22,22 @@ public class PlayerInputs : MonoBehaviour
     void Start()
     {
         isLocked = false;
+        isStartPosition = false;
+        isMovementTriggered = true;
     }
 
     private void OnMouseDown()
     {
+        isMovementTriggered = false;
+        startMousePosition = Input.mousePosition;
+        Debug.Log("OK");
         //startMousePosition = Input.mousePosition;
         //event для UI (о том, что нужно показать подсказку)
     }
 
     private void OnMouseDrag()
     {
+        
         //dragMousePosition = Input.mousePosition;
         //event для UI (о том, что мышь была сдвинута и нужно пересчитать позицию)
     }
@@ -74,7 +84,59 @@ public class PlayerInputs : MonoBehaviour
                 // event для игры (о направлении передвижения)
                 Field.instance.Move(moveDirection);
             }
-        }
 
+            if (Input.GetMouseButton(0))
+            {
+                if (isStartPosition == false)
+                {
+                    startMousePosition = Input.mousePosition;
+                    isStartPosition = true;
+                    isMovementTriggered = false;
+                    Debug.Log("start");
+                }
+
+                
+
+                if (isMovementTriggered == false)
+                {
+                    dragMousePosition = Input.mousePosition;
+
+                    deltaHorizontal = dragMousePosition.x - startMousePosition.x;
+                    deltaVertical = dragMousePosition.y - startMousePosition.y;
+                    Debug.Log(deltaVertical);
+
+                    if (Screen.height / 5 < Mathf.Abs(deltaVertical))
+                    {
+                        if (deltaVertical > 0)
+                        {
+                            Field.instance.Move(Vector2Int.up);
+                        }
+                        else
+                        {
+                            Field.instance.Move(Vector2Int.down);
+                        }
+
+                        isMovementTriggered = true;
+                    }
+                    else if (Screen.width / 5 < Mathf.Abs(deltaHorizontal))
+                    {
+                        if (deltaHorizontal > 0)
+                        {
+                            Field.instance.Move(Vector2Int.right);
+                        }
+                        else
+                        {
+                            Field.instance.Move(Vector2Int.left);
+                        }
+
+                        isMovementTriggered = true;
+                    }
+                }
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                isStartPosition = false;
+            }
+        }
     }
 }
