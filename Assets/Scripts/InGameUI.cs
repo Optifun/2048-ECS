@@ -125,6 +125,7 @@ public class InGameUI : MonoBehaviour
         cellCount += _sign;
         fieldNameText.text = $"{cellCount}x{cellCount}";
         Field.instance.SetCellCount(cellCount);
+        StartNewGame();
 
         if (cellCount >= 6)
         {

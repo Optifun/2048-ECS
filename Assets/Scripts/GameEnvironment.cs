@@ -6,6 +6,7 @@ public class GameEnvironment : MonoBehaviour
 {
     private int score;
     private int best;
+    private int fieldSize;
 
     public void SaveGame()
     {
@@ -29,6 +30,13 @@ public class GameEnvironment : MonoBehaviour
         //invoke UI
     }
 
+    public void SetFieldSize(int _sign)
+    {
+        if ((_sign == -1 && fieldSize > 4) || (_sign == 1 && fieldSize < 7))
+            fieldSize += _sign;
+        
+    }
+
     public void Move(Vector2Int _direction)
     {
         Field.instance.Move(_direction);
@@ -39,6 +47,7 @@ public class GameEnvironment : MonoBehaviour
     {
         score = 0;
         best = 0;
+        fieldSize = 4;
     }
 
     // Update is called once per frame

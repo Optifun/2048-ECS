@@ -32,17 +32,24 @@ public class Field : MonoBehaviour
     public GameObject tilePrefab;
     public Cell[,] field { get; private set; }
 
+    //back to last turn
     List<(Vector2Int, int)> lastTurnTiles = new List<(Vector2Int, int)>();
 
     private Task Movement;
 
+    //fieldSize
     static public int cellCount { get; private set; }
+    //tiles count on field
     private int tilesCount;
+    //tiles that finished their animations (moving, merging, spawning)
     private int tilesReadyCount;
+    //total value of the merged tiles
     private int mergingSummary;
 
+    //for scaling
     const float camToField = 1.777f; // 8 изначальный размер orthographicsize - 4 кол-во клеток
 
+    //for scaling
     static float size = 2;
     static float indention = size / 8; // 0.25f
     static float fieldsize;
@@ -127,7 +134,7 @@ public class Field : MonoBehaviour
 
     private void SaveField()
     {
-        PlayerPrefs.SetInt($"GameMode {cellCount} exists", cellCount);
+        PlayerPrefs.SetInt($"GameMode {cellCount} exists", 1);
         for (int i = 0; i < cellCount; i++)
         {
             for (int j = 0; j < cellCount; j++)
@@ -181,7 +188,7 @@ public class Field : MonoBehaviour
     private void ResetField(ResetFieldType _type)
     {
         if (_type == 0)
-            PlayerPrefs.SetInt("GameMode", 0);
+            PlayerPrefs.SetInt($"GameMode {cellCount} exists", 0);
 
         for (int i = 0; i < cellCount; i++)
         {
@@ -258,6 +265,7 @@ public class Field : MonoBehaviour
         }
     }
 
+    //calculation of the next move and its visualization
     public void Move(Vector2Int _direction)
     {
         bool _isMoved = false;
@@ -381,7 +389,7 @@ public class Field : MonoBehaviour
             }
 
             //TODO: узнать есть ли какой-то ход для того, чтобы "разрулить" ситуацию
-            if (tilesCount == 16 && isExistNextMove() == false)
+            if (tilesCount >= cellCount*cellCount && isExistNextMove() == false)
             {
                 InGameUI.instance.GameOver();
             }
