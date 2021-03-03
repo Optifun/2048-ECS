@@ -101,6 +101,23 @@ public class Field : MonoBehaviour
             //Если прошлая игра не смогла загрузиться то, тогда появляется 2 плитки одна из них может принимать значения: 2 либо 4; другая только 2.
             CreateTile();
             CreateTile();
+
+            /*
+            int n = 1;
+            int value = 2;
+            for (int i = 0; i < cellCount; i++)
+            {
+                for (int j = 0; j < cellCount; j++)
+                {
+                    if (n <= 13)
+                    {
+                        CreateTile(new Vector2Int(i, j), value);
+                        value *= 2;
+                        n++;
+                    }
+                }
+            }
+            */
         }
     }
 
