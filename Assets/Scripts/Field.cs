@@ -47,7 +47,7 @@ public class Field : MonoBehaviour
     private int mergingSummary;
 
     //for scaling
-    const float camToField = 1.777f; // 8 изначальный размер orthographicsize - 4 кол-во клеток
+    const float camToField = 1.6f; // 8 изначальный размер orthographicsize - 4 кол-во клеток
 
     //for scaling
     static float size = 2;

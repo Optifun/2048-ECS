@@ -8,6 +8,7 @@ public class PlayerInputs : MonoBehaviour
     Vector3 dragMousePosition = Vector3.zero;
     Vector3 endMousePosition = Vector3.zero;
     Vector2Int moveDirection = Vector2Int.zero;
+    float size;
     float deltaHorizontal;
     float deltaVertical;
 
@@ -24,6 +25,8 @@ public class PlayerInputs : MonoBehaviour
         isLocked = false;
         isStartPosition = false;
         isMovementTriggered = true;
+
+        size = Mathf.Min(Screen.height, Screen.width);
     }
 
     private void OnMouseDown()
@@ -92,7 +95,6 @@ public class PlayerInputs : MonoBehaviour
                     startMousePosition = Input.mousePosition;
                     isStartPosition = true;
                     isMovementTriggered = false;
-                    Debug.Log("start");
                 }
 
                 
@@ -103,9 +105,8 @@ public class PlayerInputs : MonoBehaviour
 
                     deltaHorizontal = dragMousePosition.x - startMousePosition.x;
                     deltaVertical = dragMousePosition.y - startMousePosition.y;
-                    Debug.Log(deltaVertical);
 
-                    if (Screen.height / 5 < Mathf.Abs(deltaVertical))
+                    if (size / 12 < Mathf.Abs(deltaVertical))
                     {
                         if (deltaVertical > 0)
                         {
@@ -118,7 +119,7 @@ public class PlayerInputs : MonoBehaviour
 
                         isMovementTriggered = true;
                     }
-                    else if (Screen.width / 5 < Mathf.Abs(deltaHorizontal))
+                    else if (size / 12 < Mathf.Abs(deltaHorizontal))
                     {
                         if (deltaHorizontal > 0)
                         {
