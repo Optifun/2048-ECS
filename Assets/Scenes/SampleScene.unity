@@ -651,7 +651,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1742,7 +1742,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.23529413, g: 0.23529413, b: 0.23529413, a: 1}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1818,7 +1818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.23529413, g: 0.23529413, b: 0.23529413, a: 1}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1852,7 +1852,7 @@ PrefabInstance:
     - target: {fileID: 4449929792971283436, guid: f2172adb86a754a49801279418b68289,
         type: 3}
       propertyPath: m_Name
-      value: Particle System (1)
+      value: Particle System background
       objectReference: {fileID: 0}
     - target: {fileID: 4449929792971283436, guid: f2172adb86a754a49801279418b68289,
         type: 3}
@@ -1872,17 +1872,17 @@ PrefabInstance:
     - target: {fileID: 4449929792971283438, guid: f2172adb86a754a49801279418b68289,
         type: 3}
       propertyPath: InitialModule.startColor.maxGradient.key0.a
-      value: 0.11764706
+      value: 0.27450982
       objectReference: {fileID: 0}
     - target: {fileID: 4449929792971283438, guid: f2172adb86a754a49801279418b68289,
         type: 3}
       propertyPath: InitialModule.startColor.maxGradient.key2.a
-      value: 0.39215687
+      value: 0.15686275
       objectReference: {fileID: 0}
     - target: {fileID: 4449929792971283438, guid: f2172adb86a754a49801279418b68289,
         type: 3}
       propertyPath: InitialModule.startColor.maxGradient.key1.a
-      value: 0.11764706
+      value: 0.34509805
       objectReference: {fileID: 0}
     - target: {fileID: 4449929792971283438, guid: f2172adb86a754a49801279418b68289,
         type: 3}
@@ -1914,6 +1914,11 @@ PrefabInstance:
       propertyPath: lengthInSec
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 4449929792971283438, guid: f2172adb86a754a49801279418b68289,
+        type: 3}
+      propertyPath: InitialModule.startColor.maxGradient.atime0
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4449929792971283439, guid: f2172adb86a754a49801279418b68289,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1927,7 +1932,7 @@ PrefabInstance:
     - target: {fileID: 4449929792971283439, guid: f2172adb86a754a49801279418b68289,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.6400003
+      value: 53.7
       objectReference: {fileID: 0}
     - target: {fileID: 4449929792971283439, guid: f2172adb86a754a49801279418b68289,
         type: 3}
@@ -2233,7 +2238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2363,7 +2368,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2673,7 +2678,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.23529413, g: 0.23529413, b: 0.23529413, a: 1}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2933,7 +2938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.54901963}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -3031,7 +3036,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: af21968f34948324ea4dc1d775faa793, type: 3}
-  m_Color: {r: 0.14509805, g: 0.14509805, b: 0.14509805, a: 1}
+  m_Color: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 0.54901963}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 1

@@ -4,21 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class PowerOfTwo
-{
-    public int value { get; private set; }
-
-    public PowerOfTwo()
-    {
-        value = 2;
-    }
-
-    public PowerOfTwo(int _pow)
-    {
-        value = (int)Mathf.Pow(2, _pow);
-    }
-}
-
 public enum ResetFieldType
 {
     retry = 0,
@@ -99,7 +84,7 @@ public class Field : MonoBehaviour
         if (!LoadGame())
         {
             //Если прошлая игра не смогла загрузиться то, тогда появляется 2 плитки одна из них может принимать значения: 2 либо 4; другая только 2.
-            CreateTile();
+            CreateTile(new Vector2Int(0, 0), 256);
             CreateTile();
 
             /*

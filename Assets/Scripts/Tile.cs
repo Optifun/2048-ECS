@@ -35,9 +35,9 @@ public class Tile : MonoBehaviour
     {
         int randNum = Random.Range(0, 10);
         if (randNum == 9)
-            value = (new PowerOfTwo(2)).value;
+            value = 4;
         else
-            value = (new PowerOfTwo(1)).value;
+            value = 2;
 
         numberText.text = value.ToString();
 
