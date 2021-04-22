@@ -11,49 +11,39 @@ public class Tile : MonoBehaviour
     public Text numberText;
     public SpriteRenderer sprite;
 
-    public Color[] colorPallete = new Color[13];
+    public Color[] lightColorPallete = new Color[13];
+    public Color[] darkColorPallete = new Color[13];
     private Color textColor;
     private Color spriteColor;
 
     public Animator animator;
-
-    /*
-    public void Merged()
-    {
-        value *= 2;
-        StartCoroutine(Moving());
-        SetAppearance();
-    }
-    */
 
     public void Merge()
     {
         StartCoroutine(Merging());
     }
 
-    public void Initialize(Vector2Int _position)
+    public void Initialize(Vector2Int _position, Theme _theme)
     {
         int randNum = Random.Range(0, 10);
         if (randNum == 9)
-            value = (new PowerOfTwo(2)).value;
+            value = 4;
         else
-            value = (new PowerOfTwo(1)).value;
-
-        numberText.text = value.ToString();
+            value = 2;
 
         position = _position;
 
-        SetAppearance();
+        SetAppearance(_theme);
         animator.SetInteger("state", 1);
     }
 
-    public void Initialize(int _value, Vector2Int _position)
+    public void Initialize(int _value, Vector2Int _position, Theme _theme)
     {
         value = _value;
 
         position = _position;
 
-        SetAppearance();
+        SetAppearance(_theme);
         animator.SetInteger("state", 2);
     }
 
@@ -64,20 +54,28 @@ public class Tile : MonoBehaviour
         StartCoroutine(Moving());
     }
 
-    public void SetAppearance()
+    public void SetAppearance(Theme _theme)
     {
-        spriteColor = colorPallete[(int)Mathf.Log(value, 2) - 1];
-
-        if (spriteColor.grayscale >= 160)
+        if (_theme == Theme.dark)
         {
-            textColor = new Color(45, 45, 45);
+            spriteColor = darkColorPallete[(int)Mathf.Log(value, 2) - 1];
         }
         else
         {
-            textColor = new Color(236, 236, 236);
+            spriteColor = lightColorPallete[(int)Mathf.Log(value, 2) - 1];
         }
 
-        sprite.color = colorPallete[(int)Mathf.Log(value, 2) - 1];
+        if (spriteColor.grayscale > 0.735f)
+        {
+            textColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+        }
+        else
+        {
+            textColor = new Color(1, 1, 1, 0.3f);
+        }
+
+        sprite.color = spriteColor;
+        numberText.color = textColor;
         numberText.text = value.ToString();
     }
 

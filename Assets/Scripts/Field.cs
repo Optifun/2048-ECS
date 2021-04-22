@@ -4,21 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class PowerOfTwo
-{
-    public int value { get; private set; }
-
-    public PowerOfTwo()
-    {
-        value = 2;
-    }
-
-    public PowerOfTwo(int _pow)
-    {
-        value = (int)Mathf.Pow(2, _pow);
-    }
-}
-
 public enum ResetFieldType
 {
     retry = 0,
@@ -38,7 +23,9 @@ public class Field : MonoBehaviour
     private Task Movement;
 
     //fieldSize
-    static public int cellCount { get; private set; }
+    static private int cellCount;
+    //theme
+    static private Theme theme;
     //tiles count on field
     private int tilesCount;
     //tiles that finished their animations (moving, merging, spawning)
@@ -46,20 +33,11 @@ public class Field : MonoBehaviour
     //total value of the merged tiles
     private int mergingSummary;
 
-    //for scaling
-    const float camToField = 1.777f; // 8 изначальный размер orthographicsize - 4 кол-во клеток
-
-    //for scaling
-    static float size = 2;
-    static float indention = size / 8; // 0.25f
-    static float fieldsize;
-    static float centering;
-
     public void SetCellCount(int _cellCount)
     {
         DestroyField();
         cellCount = _cellCount;
-        StartGame();
+        SetField();
     }
 
     //Функция создает поле (cellCount) х (cellCount)
@@ -71,7 +49,7 @@ public class Field : MonoBehaviour
         {
             for (int j = 0; j < cellCount; j++)
             {
-                cellPosition = new Vector3((size + indention) * i - centering, (size + indention) * j - centering, -1);
+                cellPosition = new Vector3((GameEnvironment.transformCellSize + GameEnvironment.indention) * i - GameEnvironment.centering, (GameEnvironment.transformCellSize + GameEnvironment.indention) * j - GameEnvironment.centering, -1);
                 field[i, j] = Instantiate(cellPrefab, cellPosition, new Quaternion(0, 0, 0, 0)).GetComponent<Cell>();
                 field[i, j].Initialize(new Vector2Int(i, j));
                 field[i, j].gameObject.transform.SetParent(this.gameObject.transform);
@@ -80,16 +58,25 @@ public class Field : MonoBehaviour
         }
     }
 
-    //Функция создает поле и спавнит 2 плитки (начало игры)
-    public void StartGame()
+    public void EstablishTheme(Theme _theme)
     {
-        fieldsize = (size * cellCount + indention * (cellCount + 1)) / 2;
-        centering = fieldsize - size / 2 - indention;
+        theme = _theme;
 
-        this.gameObject.transform.localScale = new Vector3(fieldsize, fieldsize);
+        for (int i = 0; i < cellCount; i++)
+        {
+            for (int j = 0; j < cellCount; j++)
+            {
+                if (field[i, j].isFree() == false)
+                {
+                    field[i, j].tile.SetAppearance(theme);
+                }
+            }
+        }
+    }
 
-        Camera.main.orthographicSize = camToField * cellCount;
-
+    //Функция создает поле и спавнит 2 плитки (начало игры)
+    public void SetField()
+    {
         field = new Cell[cellCount, cellCount];
 
         tilesCount = 0;
@@ -173,8 +160,6 @@ public class Field : MonoBehaviour
     {
         tilesCount = 0;
         ResetField(ResetFieldType.retry);
-        CreateTile();
-        CreateTile();
 
         /*
         int _val = 1;
@@ -189,6 +174,9 @@ public class Field : MonoBehaviour
             }
         }
         */
+
+        CreateTile();
+        CreateTile();
     }
 
     void DestroyField()
@@ -247,7 +235,7 @@ public class Field : MonoBehaviour
             //Vector3 _tileGlobalPosition;
             //_tileGlobalPosition = new Vector3(field[_tilePosition.x, _tilePosition.y].transform.position.x, field[_tilePosition.x, _tilePosition.y].transform.position.y, -1); 
             Tile _newTile = Instantiate(tilePrefab, field[_tilePosition.x, _tilePosition.y].transform).GetComponent<Tile>();
-            _newTile.Initialize(_tilePosition);
+            _newTile.Initialize(_tilePosition, theme);
 
             field[_tilePosition.x, _tilePosition.y].tile = _newTile;
             _newTile.transform.SetParent(field[_tilePosition.x, _tilePosition.y].transform);
@@ -268,7 +256,7 @@ public class Field : MonoBehaviour
             //Vector3 _tileGlobalPosition;
             //_tileGlobalPosition = new Vector3(field[_position.x, _position.y].transform.position.x, field[_position.x, _position.y].transform.position.y, -10);
             Tile _newTile = Instantiate(tilePrefab, field[_position.x, _position.y].transform).GetComponent<Tile>();
-            _newTile.Initialize(_value, _position);
+            _newTile.Initialize(_value, _position, theme);
 
             field[_position.x, _position.y].tile = _newTile;
             _newTile.transform.SetParent(field[_position.x, _position.y].transform);
@@ -605,7 +593,7 @@ public class Field : MonoBehaviour
     {
         cellCount = 4;
 
-        StartGame();
+        SetField();
     }
 
     // Update is called once per frame

@@ -18,6 +18,9 @@ public class InGameUI : MonoBehaviour
     public Text fieldNameText;
     public Button DecreaseCellCountButton;
     public Button IncreaseCellCountButton;
+    public Button ThemeButton;
+    public Sprite light;
+    public Sprite dark;
 
     private int cellCount = 4;
 
@@ -44,7 +47,7 @@ public class InGameUI : MonoBehaviour
 
         SpawnPopUpText(_amount);
 
-        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", scoreAmount);
+        PlayerPrefs.SetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Score", scoreAmount);
         PlayerPrefs.Save();
 
         BackArrow.interactable = true;
@@ -57,7 +60,7 @@ public class InGameUI : MonoBehaviour
         {
             bestAmount = scoreAmount;
             bestText.text = bestAmount.ToString();
-            PlayerPrefs.SetInt($"GameMode {Field.cellCount} Best", bestAmount);
+            PlayerPrefs.SetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Best", bestAmount);
             PlayerPrefs.Save();
         }
         //TODO: transition
@@ -76,13 +79,13 @@ public class InGameUI : MonoBehaviour
     public void ResetUI()
     {
         scoreAmount = 0;
-        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", 0);
+        PlayerPrefs.SetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Score", 0);
         scoreText.text = scoreAmount.ToString();
     }
 
     public void StartNewGame()
     {
-        int amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Best");
+        int amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Best");
         if (amount > 0)
         {
             bestAmount = amount;
@@ -94,7 +97,7 @@ public class InGameUI : MonoBehaviour
         }
         bestText.text = bestAmount.ToString();
 
-        amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Score");
+        amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Score");
         if (amount > 0)
         {
             scoreAmount = amount;
@@ -106,6 +109,20 @@ public class InGameUI : MonoBehaviour
         scoreText.text = scoreAmount.ToString();
 
         BackArrow.interactable = false;
+    }
+
+    public void ChangeTheme()
+    {
+        if (GameEnvironment.instance.theme == Theme.dark)
+        {
+            ThemeButton.image.sprite = dark;
+        }
+        else
+        {
+            ThemeButton.image.sprite = light;
+        }
+
+        GameEnvironment.instance.ChangeTheme();
     }
 
     public void IncreaseCellCount()
@@ -124,7 +141,7 @@ public class InGameUI : MonoBehaviour
     {
         cellCount += _sign;
         fieldNameText.text = $"{cellCount}x{cellCount}";
-        Field.instance.SetCellCount(cellCount);
+        GameEnvironment.instance.SetFieldSize(_sign);
         StartNewGame();
 
         if (cellCount >= 6)

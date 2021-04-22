@@ -15,6 +15,8 @@ public class PlayerInputs : MonoBehaviour
     bool isStartPosition;
     bool isMovementTriggered;
 
+    float mouseSensitive = 5.5f;
+
     //event UIDirectionHint;
     //event GameMoveDirection;
 
@@ -105,7 +107,7 @@ public class PlayerInputs : MonoBehaviour
                     deltaVertical = dragMousePosition.y - startMousePosition.y;
                     Debug.Log(deltaVertical);
 
-                    if (Screen.height / 5 < Mathf.Abs(deltaVertical))
+                    if (Screen.height / mouseSensitive < Mathf.Abs(deltaVertical))
                     {
                         if (deltaVertical > 0)
                         {
@@ -118,7 +120,7 @@ public class PlayerInputs : MonoBehaviour
 
                         isMovementTriggered = true;
                     }
-                    else if (Screen.width / 5 < Mathf.Abs(deltaHorizontal))
+                    else if (Screen.width / mouseSensitive < Mathf.Abs(deltaHorizontal))
                     {
                         if (deltaHorizontal > 0)
                         {
