@@ -393,15 +393,16 @@ public class Field : MonoBehaviour
                 InGameUI.instance.IncreaseScore(mergingSummary);
             }
 
+            SaveField();
+
             //TODO: узнать есть ли какой-то ход для того, чтобы "разрулить" ситуацию
             if (tilesCount >= cellCount*cellCount && isExistNextMove() == false)
             {
+                PlayerPrefs.SetInt($"GameMode {cellCount} exists", 0);
                 InGameUI.instance.GameOver();
             }
 
             InGameUI.instance.InteractBackArrow();
-
-            SaveField();
         }
     }
 
