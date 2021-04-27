@@ -93,6 +93,7 @@ public class Tile : MonoBehaviour
 
         gameObject.transform.localPosition = new Vector3(0, 0, -1);
 
+        Field.instance.SetReady();
         StopCoroutine(Moving());
     }
 

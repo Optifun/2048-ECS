@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class PlayerInputs : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class PlayerInputs : MonoBehaviour
     Vector2Int moveDirection = Vector2Int.zero;
     float deltaHorizontal;
     float deltaVertical;
-
+    
     bool isLocked;
     bool isStartPosition;
     bool isMovementTriggered;
@@ -105,7 +106,6 @@ public class PlayerInputs : MonoBehaviour
 
                     deltaHorizontal = dragMousePosition.x - startMousePosition.x;
                     deltaVertical = dragMousePosition.y - startMousePosition.y;
-                    Debug.Log(deltaVertical);
 
                     if (Screen.height / mouseSensitive < Mathf.Abs(deltaVertical))
                     {

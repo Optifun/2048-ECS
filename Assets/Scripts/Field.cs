@@ -22,8 +22,6 @@ public class Field : MonoBehaviour
 
     private Task Movement;
 
-    //fieldSize
-    static private int cellCount;
     //theme
     static private Theme theme;
     //tiles count on field
@@ -33,10 +31,9 @@ public class Field : MonoBehaviour
     //total value of the merged tiles
     private int mergingSummary;
 
-    public void SetCellCount(int _cellCount)
+    public void SetCellCount()
     {
         DestroyField();
-        cellCount = _cellCount;
         SetField();
     }
 
@@ -45,9 +42,9 @@ public class Field : MonoBehaviour
     {
         Vector3 cellPosition;
 
-        for (int i = 0; i < cellCount; i++)
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
-            for (int j = 0; j < cellCount; j++)
+            for (int j = 0; j < GameEnvironment.cellCount; j++)
             {
                 cellPosition = new Vector3((GameEnvironment.transformCellSize + GameEnvironment.indention) * i - GameEnvironment.centering, (GameEnvironment.transformCellSize + GameEnvironment.indention) * j - GameEnvironment.centering, -1);
                 field[i, j] = Instantiate(cellPrefab, cellPosition, new Quaternion(0, 0, 0, 0)).GetComponent<Cell>();
@@ -62,9 +59,9 @@ public class Field : MonoBehaviour
     {
         theme = _theme;
 
-        for (int i = 0; i < cellCount; i++)
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
-            for (int j = 0; j < cellCount; j++)
+            for (int j = 0; j < GameEnvironment.cellCount; j++)
             {
                 if (field[i, j].isFree() == false)
                 {
@@ -77,7 +74,7 @@ public class Field : MonoBehaviour
     //Функция создает поле и спавнит 2 плитки (начало игры)
     public void SetField()
     {
-        field = new Cell[cellCount, cellCount];
+        field = new Cell[GameEnvironment.cellCount, GameEnvironment.cellCount];
 
         tilesCount = 0;
         //Создается поле (cellCount) х (cellCount)
@@ -110,17 +107,17 @@ public class Field : MonoBehaviour
 
     private bool LoadGame()
     {
-        int gameMode = PlayerPrefs.GetInt($"GameMode {cellCount} exists");
+        int gameMode = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} exists");
 
         if (gameMode == 1)
         {
             int tileValueInCell;
 
-            for (int i = 0; i < cellCount; i++)
+            for (int i = 0; i < GameEnvironment.cellCount; i++)
             {
-                for (int j = 0; j < cellCount; j++)
+                for (int j = 0; j < GameEnvironment.cellCount; j++)
                 {
-                    tileValueInCell = PlayerPrefs.GetInt($"GameMode {cellCount} Cell[{i}, {j}]");
+                    tileValueInCell = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]");
                     if (tileValueInCell > 0)
                     {
                         CreateTile(new Vector2Int(i, j), tileValueInCell);
@@ -138,18 +135,18 @@ public class Field : MonoBehaviour
 
     private void SaveField()
     {
-        PlayerPrefs.SetInt($"GameMode {cellCount} exists", 1);
-        for (int i = 0; i < cellCount; i++)
+        PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} exists", 1);
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
-            for (int j = 0; j < cellCount; j++)
+            for (int j = 0; j < GameEnvironment.cellCount; j++)
             {
                 if (field[i, j].isFree() == false)
                 {
-                    PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{i}, {j}]", field[i, j].tile.value);
+                    PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]", field[i, j].tile.value);
                 }
                 else
                 {
-                    PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{i}, {j}]", 0);
+                    PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]", 0);
                 }
             }
         }
@@ -181,9 +178,9 @@ public class Field : MonoBehaviour
 
     void DestroyField()
     {
-        for (int i = 0; i < cellCount; i++)
+        for (int i = 0; i < field.GetLength(0); i++)
         {
-            for (int j = 0; j < cellCount; j++)
+            for (int j = 0; j < field.GetLength(0); j++)
             {
                 Destroy(field[i, j].gameObject);
             }
@@ -193,11 +190,11 @@ public class Field : MonoBehaviour
     private void ResetField(ResetFieldType _type)
     {
         if (_type == 0)
-            PlayerPrefs.SetInt($"GameMode {cellCount} exists", 0);
+            PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} exists", 0);
 
-        for (int i = 0; i < cellCount; i++)
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
-            for (int j = 0; j < cellCount; j++)
+            for (int j = 0; j < GameEnvironment.cellCount; j++)
             {
                 if (field[i, j].isFree() == false)
                 {
@@ -205,7 +202,7 @@ public class Field : MonoBehaviour
                     field[i, j].Clear();
                 }
 
-                PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{i}, {j}]", 0);
+                PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]", 0);
             }
         }
         
@@ -219,7 +216,7 @@ public class Field : MonoBehaviour
         foreach (var tile in lastTurnTiles)
         {
             CreateTile(tile.Item1, tile.Item2);
-            PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{tile.Item1.x}, {tile.Item1.y}]", tile.Item2);
+            PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{tile.Item1.x}, {tile.Item1.y}]", tile.Item2);
         }
 
         tilesCount = lastTurnTiles.Count;
@@ -229,7 +226,7 @@ public class Field : MonoBehaviour
 
     private void CreateTile()
     {
-        Vector2Int _tilePosition = new Vector2Int(UnityEngine.Random.Range(0, cellCount), UnityEngine.Random.Range(0, cellCount));
+        Vector2Int _tilePosition = new Vector2Int(UnityEngine.Random.Range(0, GameEnvironment.cellCount), UnityEngine.Random.Range(0, GameEnvironment.cellCount));
         if (field[_tilePosition.x, _tilePosition.y].isFree())
         {
             //Vector3 _tileGlobalPosition;
@@ -274,7 +271,7 @@ public class Field : MonoBehaviour
     public void Move(Vector2Int _direction)
     {
         bool _isMoved = false;
-        Cell[] _cells = new Cell[cellCount];
+        Cell[] _cells = new Cell[GameEnvironment.cellCount];
         int _previousCellIndex = -1;
         int _currentCellIndex = -1;
         int _index;
@@ -294,21 +291,21 @@ public class Field : MonoBehaviour
             _signDirection = -1;
         }
 
-        for (int i = 0; i < cellCount; i++)
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
             _cells = GetLane(i, _direction);
             _previousCellIndex = -1;
 
             if (_direction.x > 0 || _direction.y > 0)
             {
-                j = cellCount - 1;
+                j = GameEnvironment.cellCount - 1;
             }
             else
             {
                 j = 0;
             }
 
-            while (j >= 0 && j <= (cellCount - 1))
+            while (j >= 0 && j <= (GameEnvironment.cellCount - 1))
             {
                 /*
                 if (_cells[j].isFree() == false)
@@ -396,9 +393,9 @@ public class Field : MonoBehaviour
             SaveField();
 
             //TODO: узнать есть ли какой-то ход для того, чтобы "разрулить" ситуацию
-            if (tilesCount >= cellCount*cellCount && isExistNextMove() == false)
+            if (tilesCount >= GameEnvironment.cellCount * GameEnvironment.cellCount && isExistNextMove() == false)
             {
-                PlayerPrefs.SetInt($"GameMode {cellCount} exists", 0);
+                PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} exists", 0);
                 InGameUI.instance.GameOver();
             }
 
@@ -408,8 +405,8 @@ public class Field : MonoBehaviour
 
     private Cell[] GetLane(int _k, Vector2Int direction)
     {
-        Cell[] _cells = new Cell[cellCount];
-        for (int i = 0; i < cellCount; i++)
+        Cell[] _cells = new Cell[GameEnvironment.cellCount];
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
             if (direction.x != 0)
             {
@@ -429,7 +426,7 @@ public class Field : MonoBehaviour
         int _currentPosition = i;
         int _nextposition = i + _direction;
 
-        while (_nextposition >= 0 && _nextposition <= (cellCount - 1) && _cells[_nextposition].isFree())
+        while (_nextposition >= 0 && _nextposition <= (GameEnvironment.cellCount - 1) && _cells[_nextposition].isFree())
         {
             _currentPosition = _nextposition;
             _nextposition = _nextposition + _direction;
@@ -525,7 +522,7 @@ public class Field : MonoBehaviour
     {
         int _previousCellIndex = -1;
 
-        for (int j = 0; j < cellCount; j++)
+        for (int j = 0; j < GameEnvironment.cellCount; j++)
         {
             if (_previousCellIndex == -1 && _lane[j].isFree() == false)
             {
@@ -555,7 +552,7 @@ public class Field : MonoBehaviour
         Cell[] verticalLane;
         Cell[] horizontalLane;
 
-        for (int i = 0; i < cellCount; i++)
+        for (int i = 0; i < GameEnvironment.cellCount; i++)
         {
             verticalLane = GetLane(i, new Vector2Int(0, 1));
             horizontalLane = GetLane(i, new Vector2Int(1, 0));
@@ -592,8 +589,6 @@ public class Field : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cellCount = 4;
-
         SetField();
     }
 

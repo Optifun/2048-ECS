@@ -47,7 +47,7 @@ public class InGameUI : MonoBehaviour
 
         SpawnPopUpText(_amount);
 
-        PlayerPrefs.SetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Score", scoreAmount);
+        PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Score", scoreAmount);
         PlayerPrefs.Save();
 
         BackArrow.interactable = true;
@@ -60,7 +60,7 @@ public class InGameUI : MonoBehaviour
         {
             bestAmount = scoreAmount;
             bestText.text = bestAmount.ToString();
-            PlayerPrefs.SetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Best", bestAmount);
+            PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Best", bestAmount);
             PlayerPrefs.Save();
         }
         //TODO: transition
@@ -79,13 +79,13 @@ public class InGameUI : MonoBehaviour
     public void ResetUI()
     {
         scoreAmount = 0;
-        PlayerPrefs.SetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Score", 0);
+        PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Score", 0);
         scoreText.text = scoreAmount.ToString();
     }
 
     public void StartNewGame()
     {
-        int amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Best");
+        int amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} Best");
         if (amount > 0)
         {
             bestAmount = amount;
@@ -97,7 +97,7 @@ public class InGameUI : MonoBehaviour
         }
         bestText.text = bestAmount.ToString();
 
-        amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.instance.currentFieldSize} Score");
+        amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} Score");
         if (amount > 0)
         {
             scoreAmount = amount;

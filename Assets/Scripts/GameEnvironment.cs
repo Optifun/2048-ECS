@@ -16,7 +16,7 @@ public class GameEnvironment : MonoBehaviour
     private int score;
     private int best;
 
-    public int currentFieldSize { get; private set; }
+    public static int cellCount { get; private set; }
 
     public Theme theme;
 
@@ -53,10 +53,10 @@ public class GameEnvironment : MonoBehaviour
 
     public void SetFieldSize(int _sign)
     {
-        if ((_sign == -1 && currentFieldSize > 4) || (_sign == 1 && currentFieldSize < 7))
-            currentFieldSize += _sign;
+        if ((_sign == -1 && cellCount > 4) || (_sign == 1 && cellCount < 7))
+            cellCount += _sign;
         SetMapping();
-        Field.instance.SetCellCount(currentFieldSize);
+        Field.instance.SetCellCount();
     }
 
     public void Move(Vector2Int _direction)
@@ -97,12 +97,12 @@ public class GameEnvironment : MonoBehaviour
     {
         transformCellSize = 2;
         indention = transformCellSize / 8;
-        transformFieldsize = (transformCellSize * currentFieldSize + indention * (currentFieldSize + 1)) / 2;
+        transformFieldsize = (transformCellSize * cellCount + indention * (cellCount + 1)) / 2;
         centering = transformFieldsize - transformCellSize / 2 - indention;
 
         Field.instance.gameObject.transform.localScale = new Vector3(transformFieldsize, transformFieldsize);
 
-        Camera.main.orthographicSize = camToField * currentFieldSize;
+        Camera.main.orthographicSize = camToField * cellCount;
         Camera.main.backgroundColor = lightBackground;
     }
 
@@ -111,7 +111,7 @@ public class GameEnvironment : MonoBehaviour
     {
         score = 0;
         best = 0;
-        currentFieldSize = 4;
+        cellCount = 4;
         theme = Theme.light;
         SetMapping();
     }
