@@ -2,14 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Theme
-{
-    light = 0,
-    dark = 1,
-}
-
 public class GameEnvironment : MonoBehaviour
-{
+{/*
     public static GameEnvironment instance;
     public Color lightBackground; //FAE6D2
     public Color darkBackground; //242830
@@ -121,4 +115,5 @@ public class GameEnvironment : MonoBehaviour
     {
         
     }
+    */
 }

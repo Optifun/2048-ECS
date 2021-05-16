@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Tile : MonoBehaviour
 {
@@ -17,11 +20,6 @@ public class Tile : MonoBehaviour
     private Color spriteColor;
 
     public Animator animator;
-
-    public void Merge()
-    {
-        StartCoroutine(Merging());
-    }
 
     public void Initialize(Vector2Int _position, Theme _theme)
     {
@@ -47,22 +45,29 @@ public class Tile : MonoBehaviour
         animator.SetInteger("state", 2);
     }
 
-    public void Set(Vector2Int _position)
+    public UniTask Set(Vector2Int _position)
     {
         position = _position;
-        //gameObject.transform.localPosition.magnitude / 10
-        StartCoroutine(Moving());
+        return Moving().ToUniTask(this);
     }
 
     public void SetAppearance(Theme _theme)
     {
+        int powerNum = (int)Mathf.Log(value, 2);
+
         if (_theme == Theme.dark)
         {
-            spriteColor = darkColorPallete[(int)Mathf.Log(value, 2) - 1];
+            if (powerNum <= darkColorPallete.Length)
+                spriteColor = darkColorPallete[powerNum - 1];
+            else
+                spriteColor = darkColorPallete[darkColorPallete.Length - 1];
         }
         else
         {
-            spriteColor = lightColorPallete[(int)Mathf.Log(value, 2) - 1];
+            if (powerNum <= lightColorPallete.Length)
+                spriteColor = lightColorPallete[powerNum - 1];
+            else
+                spriteColor = lightColorPallete[lightColorPallete.Length - 1];
         }
 
         if (spriteColor.grayscale > 0.735f)
@@ -92,38 +97,17 @@ public class Tile : MonoBehaviour
         }
 
         gameObject.transform.localPosition = new Vector3(0, 0, -1);
-
-        Field.instance.SetReady();
-        StopCoroutine(Moving());
-    }
-
-    public IEnumerator Merging()
-    {
-        float _startMagnitude = Mathf.Abs(gameObject.transform.localPosition.magnitude);
-        float _currentMagnitude = _startMagnitude;
-
-        while (_startMagnitude / 10 < _currentMagnitude)
-        {
-            gameObject.transform.localPosition = Vector2.Lerp(gameObject.transform.localPosition, Vector2.zero, Time.fixedDeltaTime * 17);
-            _currentMagnitude = Mathf.Abs(gameObject.transform.localPosition.magnitude);
-            yield return new WaitForSeconds(0.01f);
-        }
-
-        gameObject.transform.localPosition = new Vector3(0, 0, -1);
-
-        Destroy(this.gameObject);
-        StopCoroutine(Moving());
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

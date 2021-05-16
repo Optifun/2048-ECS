@@ -7,19 +7,15 @@ public class PlayerInputs : MonoBehaviour
 {
     Vector3 startMousePosition = Vector3.zero;
     Vector3 dragMousePosition = Vector3.zero;
-    Vector3 endMousePosition = Vector3.zero;
-    Vector2Int moveDirection = Vector2Int.zero;
+
     float deltaHorizontal;
     float deltaVertical;
-    
+
     bool isLocked;
     bool isStartPosition;
     bool isMovementTriggered;
 
     float mouseSensitive = 5.5f;
-
-    //event UIDirectionHint;
-    //event GameMoveDirection;
 
     // Start is called before the first frame update
     void Start()
@@ -27,31 +23,10 @@ public class PlayerInputs : MonoBehaviour
         isLocked = false;
         isStartPosition = false;
         isMovementTriggered = true;
+        Field.instance.finishMove += unlockInput;
     }
 
-    private void OnMouseDown()
-    {
-        isMovementTriggered = false;
-        startMousePosition = Input.mousePosition;
-        Debug.Log("OK");
-        //startMousePosition = Input.mousePosition;
-        //event для UI (о том, что нужно показать подсказку)
-    }
-
-    private void OnMouseDrag()
-    {
-        
-        //dragMousePosition = Input.mousePosition;
-        //event для UI (о том, что мышь была сдвинута и нужно пересчитать позицию)
-    }
-
-    private void OnMouseUp()
-    {
-        //endMousePosition = Input.mousePosition;
-        //event для UI (о том, чтобы отключить подсказку) и игры (о направлении передвижения)
-    }
-
-    private Vector2Int GetMoveDirectionFromKeyboard()
+    private Vector2Int GetKeyboardMoveDirection()
     {
         if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow))
         {
@@ -75,70 +50,91 @@ public class PlayerInputs : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private Vector2Int GetMouseMoveDirection()
+    {
+        Vector2Int direction = Vector2Int.zero;
+
+        if (Input.GetMouseButton(0))
+        {
+            if (isStartPosition == false)
+            {
+                startMousePosition = Input.mousePosition;
+                isStartPosition = true;
+                isMovementTriggered = false;
+            }
+
+            if (isMovementTriggered == false)
+            {
+                dragMousePosition = Input.mousePosition;
+
+                deltaHorizontal = dragMousePosition.x - startMousePosition.x;
+                deltaVertical = dragMousePosition.y - startMousePosition.y;
+
+                if (Screen.height / mouseSensitive < Mathf.Abs(deltaVertical))
+                {
+                    if (deltaVertical > 0)
+                    {
+                        direction = Vector2Int.up;
+                    }
+                    else
+                    {
+                        direction = Vector2Int.down;
+                    }
+
+                    isMovementTriggered = true;
+                }
+                else if (Screen.width / mouseSensitive < Mathf.Abs(deltaHorizontal))
+                {
+                    if (deltaHorizontal > 0)
+                    {
+                        direction = Vector2Int.right;
+                    }
+                    else
+                    {
+                        direction = Vector2Int.left;
+                    }
+
+                    isMovementTriggered = true;
+                }
+            }
+        }
+
+        return direction;
+    }
+
+    private void Move()
     {
         if (isLocked == false)
         {
-            moveDirection = GetMoveDirectionFromKeyboard();
+            Vector2Int keyboardMoveDirection = GetKeyboardMoveDirection();
+            Vector2Int mouseMoveDirection = GetMouseMoveDirection();
 
-            if (moveDirection != Vector2Int.zero)
+            if (keyboardMoveDirection != Vector2Int.zero)
             {
-                // event для игры (о направлении передвижения)
-                Field.instance.Move(moveDirection);
+                isLocked = true;
+                Field.instance.Move(keyboardMoveDirection);
             }
-
-            if (Input.GetMouseButton(0))
+            else if (mouseMoveDirection != Vector2Int.zero)
             {
-                if (isStartPosition == false)
-                {
-                    startMousePosition = Input.mousePosition;
-                    isStartPosition = true;
-                    isMovementTriggered = false;
-                    Debug.Log("start");
-                }
-
-                
-
-                if (isMovementTriggered == false)
-                {
-                    dragMousePosition = Input.mousePosition;
-
-                    deltaHorizontal = dragMousePosition.x - startMousePosition.x;
-                    deltaVertical = dragMousePosition.y - startMousePosition.y;
-
-                    if (Screen.height / mouseSensitive < Mathf.Abs(deltaVertical))
-                    {
-                        if (deltaVertical > 0)
-                        {
-                            Field.instance.Move(Vector2Int.up);
-                        }
-                        else
-                        {
-                            Field.instance.Move(Vector2Int.down);
-                        }
-
-                        isMovementTriggered = true;
-                    }
-                    else if (Screen.width / mouseSensitive < Mathf.Abs(deltaHorizontal))
-                    {
-                        if (deltaHorizontal > 0)
-                        {
-                            Field.instance.Move(Vector2Int.right);
-                        }
-                        else
-                        {
-                            Field.instance.Move(Vector2Int.left);
-                        }
-
-                        isMovementTriggered = true;
-                    }
-                }
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                isStartPosition = false;
+                isLocked = true;
+                Field.instance.Move(mouseMoveDirection);
             }
         }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            isStartPosition = false;
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        Move();
+    }
+
+    private void unlockInput()
+    {
+        isLocked = false;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,8 +23,17 @@ public class Field : MonoBehaviour
 
     private Task Movement;
 
-    //theme
-    static private Theme theme;
+    //Количество клеток на игровом поле
+    static public int cellCount { get; private set; }
+
+    //Настройка размеров
+    const float cameraToField = 1.777f; // 8 изначальный размер orthographicsize - 4 кол-во клеток
+
+    public static float transformCellSize;
+    public static float indention; // 0.25f
+    public static float transformFieldsize;
+    public static float centering;
+
     //tiles count on field
     private int tilesCount;
     //tiles that finished their animations (moving, merging, spawning)
@@ -31,8 +41,17 @@ public class Field : MonoBehaviour
     //total value of the merged tiles
     private int mergingSummary;
 
-    public void SetCellCount()
+    private List<(Tile, Tile)> mergingTiles = new List<(Tile, Tile)>();
+
+    private List<UniTask> _accumulatedMoves = new List<UniTask>();
+
+    public event Action finishMove;
+
+    public void SetFieldSize(int _sign)
     {
+        if ((_sign == -1 && cellCount > 4) || (_sign == 1 && cellCount < 7))
+            cellCount += _sign;
+        SetMapping();
         DestroyField();
         SetField();
     }
@@ -42,11 +61,11 @@ public class Field : MonoBehaviour
     {
         Vector3 cellPosition;
 
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        for (int i = 0; i < cellCount; i++)
         {
-            for (int j = 0; j < GameEnvironment.cellCount; j++)
+            for (int j = 0; j < cellCount; j++)
             {
-                cellPosition = new Vector3((GameEnvironment.transformCellSize + GameEnvironment.indention) * i - GameEnvironment.centering, (GameEnvironment.transformCellSize + GameEnvironment.indention) * j - GameEnvironment.centering, -1);
+                cellPosition = new Vector3((transformCellSize + indention) * i - centering, (transformCellSize + indention) * j - centering, -1);
                 field[i, j] = Instantiate(cellPrefab, cellPosition, new Quaternion(0, 0, 0, 0)).GetComponent<Cell>();
                 field[i, j].Initialize(new Vector2Int(i, j));
                 field[i, j].gameObject.transform.SetParent(this.gameObject.transform);
@@ -55,17 +74,15 @@ public class Field : MonoBehaviour
         }
     }
 
-    public void EstablishTheme(Theme _theme)
+    public void SetTheme(Theme _theme)
     {
-        theme = _theme;
-
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        for (int i = 0; i < cellCount; i++)
         {
-            for (int j = 0; j < GameEnvironment.cellCount; j++)
+            for (int j = 0; j < cellCount; j++)
             {
                 if (field[i, j].isFree() == false)
                 {
-                    field[i, j].tile.SetAppearance(theme);
+                    field[i, j].tile.SetAppearance(_theme);
                 }
             }
         }
@@ -74,7 +91,7 @@ public class Field : MonoBehaviour
     //Функция создает поле и спавнит 2 плитки (начало игры)
     public void SetField()
     {
-        field = new Cell[GameEnvironment.cellCount, GameEnvironment.cellCount];
+        field = new Cell[cellCount, cellCount];
 
         tilesCount = 0;
         //Создается поле (cellCount) х (cellCount)
@@ -85,39 +102,22 @@ public class Field : MonoBehaviour
             //Если прошлая игра не смогла загрузиться то, тогда появляется 2 плитки одна из них может принимать значения: 2 либо 4; другая только 2.
             CreateTile();
             CreateTile();
-
-            /*
-            int n = 1;
-            int value = 2;
-            for (int i = 0; i < cellCount; i++)
-            {
-                for (int j = 0; j < cellCount; j++)
-                {
-                    if (n <= 13)
-                    {
-                        CreateTile(new Vector2Int(i, j), value);
-                        value *= 2;
-                        n++;
-                    }
-                }
-            }
-            */
         }
     }
 
     private bool LoadGame()
     {
-        int gameMode = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} exists");
+        int gameMode = PlayerPrefs.GetInt($"GameMode {cellCount} exists");
 
         if (gameMode == 1)
         {
             int tileValueInCell;
 
-            for (int i = 0; i < GameEnvironment.cellCount; i++)
+            for (int i = 0; i < cellCount; i++)
             {
-                for (int j = 0; j < GameEnvironment.cellCount; j++)
+                for (int j = 0; j < cellCount; j++)
                 {
-                    tileValueInCell = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]");
+                    tileValueInCell = PlayerPrefs.GetInt($"GameMode {cellCount} Cell[{i}, {j}]");
                     if (tileValueInCell > 0)
                     {
                         CreateTile(new Vector2Int(i, j), tileValueInCell);
@@ -135,18 +135,18 @@ public class Field : MonoBehaviour
 
     private void SaveField()
     {
-        PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} exists", 1);
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        PlayerPrefs.SetInt($"GameMode {cellCount} exists", 1);
+        for (int i = 0; i < cellCount; i++)
         {
-            for (int j = 0; j < GameEnvironment.cellCount; j++)
+            for (int j = 0; j < cellCount; j++)
             {
                 if (field[i, j].isFree() == false)
                 {
-                    PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]", field[i, j].tile.value);
+                    PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{i}, {j}]", field[i, j].tile.value);
                 }
                 else
                 {
-                    PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]", 0);
+                    PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{i}, {j}]", 0);
                 }
             }
         }
@@ -157,6 +157,8 @@ public class Field : MonoBehaviour
     {
         tilesCount = 0;
         ResetField(ResetFieldType.retry);
+
+
 
         /*
         int _val = 1;
@@ -190,11 +192,11 @@ public class Field : MonoBehaviour
     private void ResetField(ResetFieldType _type)
     {
         if (_type == 0)
-            PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} exists", 0);
+            PlayerPrefs.SetInt($"GameMode {cellCount} exists", 0);
 
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        for (int i = 0; i < cellCount; i++)
         {
-            for (int j = 0; j < GameEnvironment.cellCount; j++)
+            for (int j = 0; j < cellCount; j++)
             {
                 if (field[i, j].isFree() == false)
                 {
@@ -202,7 +204,7 @@ public class Field : MonoBehaviour
                     field[i, j].Clear();
                 }
 
-                PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{i}, {j}]", 0);
+                PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{i}, {j}]", 0);
             }
         }
         
@@ -216,7 +218,7 @@ public class Field : MonoBehaviour
         foreach (var tile in lastTurnTiles)
         {
             CreateTile(tile.Item1, tile.Item2);
-            PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Cell[{tile.Item1.x}, {tile.Item1.y}]", tile.Item2);
+            PlayerPrefs.SetInt($"GameMode {cellCount} Cell[{tile.Item1.x}, {tile.Item1.y}]", tile.Item2);
         }
 
         tilesCount = lastTurnTiles.Count;
@@ -226,17 +228,14 @@ public class Field : MonoBehaviour
 
     private void CreateTile()
     {
-        Vector2Int _tilePosition = new Vector2Int(UnityEngine.Random.Range(0, GameEnvironment.cellCount), UnityEngine.Random.Range(0, GameEnvironment.cellCount));
+        Vector2Int _tilePosition = new Vector2Int(UnityEngine.Random.Range(0, cellCount), UnityEngine.Random.Range(0, cellCount));
         if (field[_tilePosition.x, _tilePosition.y].isFree())
         {
-            //Vector3 _tileGlobalPosition;
-            //_tileGlobalPosition = new Vector3(field[_tilePosition.x, _tilePosition.y].transform.position.x, field[_tilePosition.x, _tilePosition.y].transform.position.y, -1); 
             Tile _newTile = Instantiate(tilePrefab, field[_tilePosition.x, _tilePosition.y].transform).GetComponent<Tile>();
-            _newTile.Initialize(_tilePosition, theme);
+            _newTile.Initialize(_tilePosition, InGameUI.instance.theme);
 
             field[_tilePosition.x, _tilePosition.y].tile = _newTile;
             _newTile.transform.SetParent(field[_tilePosition.x, _tilePosition.y].transform);
-            //_newTile.transform.localPosition = new Vector3(0, 0 -1);
 
             tilesCount++;
         }
@@ -250,14 +249,11 @@ public class Field : MonoBehaviour
     {
         if (field[_position.x, _position.y].isFree())
         {
-            //Vector3 _tileGlobalPosition;
-            //_tileGlobalPosition = new Vector3(field[_position.x, _position.y].transform.position.x, field[_position.x, _position.y].transform.position.y, -10);
             Tile _newTile = Instantiate(tilePrefab, field[_position.x, _position.y].transform).GetComponent<Tile>();
-            _newTile.Initialize(_value, _position, theme);
+            _newTile.Initialize(_value, _position, InGameUI.instance.theme);
 
             field[_position.x, _position.y].tile = _newTile;
             _newTile.transform.SetParent(field[_position.x, _position.y].transform);
-            //_newTile.transform.localPosition = new Vector3(0, 0, -10);
 
             tilesCount++;
         }
@@ -271,7 +267,8 @@ public class Field : MonoBehaviour
     public void Move(Vector2Int _direction)
     {
         bool _isMoved = false;
-        Cell[] _cells = new Cell[GameEnvironment.cellCount];
+        _accumulatedMoves.Clear();
+        Cell[] _cells = new Cell[cellCount];
         int _previousCellIndex = -1;
         int _currentCellIndex = -1;
         int _index;
@@ -291,47 +288,22 @@ public class Field : MonoBehaviour
             _signDirection = -1;
         }
 
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        for (int i = 0; i < cellCount; i++)
         {
-            _cells = GetLane(i, _direction);
+            _cells = GetCellsInRow(i, _direction);
             _previousCellIndex = -1;
 
             if (_direction.x > 0 || _direction.y > 0)
             {
-                j = GameEnvironment.cellCount - 1;
+                j = cellCount - 1;
             }
             else
             {
                 j = 0;
             }
 
-            while (j >= 0 && j <= (GameEnvironment.cellCount - 1))
+            while (j >= 0 && j <= (cellCount - 1))
             {
-                /*
-                if (_cells[j].isFree() == false)
-                {
-                    if (_previousCellIndex == -1)
-                    {
-                        _previousCellIndex = j;
-                        _previousCellIndex = MoveTileToAvailableCell(_signDirection, _previousCellIndex, _cells);
-                    }
-                    else
-                    {
-                        _currentCellIndex = j;
-
-                        if (isMergiable(_currentCellIndex, _previousCellIndex, _cells) == true)
-                        {
-                            Merge(_signDirection, _currentCellIndex, _previousCellIndex, ref _cells);
-                            _previousCellIndex = -1;
-                        }
-
-                        MoveTileToAvailableCell(_signDirection, _currentCellIndex, _cells);
-                    }
-
-                    
-                    _previousCellIndex = _currentCellIndex;
-                }
-                */
                 if (_previousCellIndex == -1 && _cells[j].isFree() == false)
                 {
                     lastTurnTiles.Add((_cells[j].position, _cells[j].tile.value));
@@ -355,7 +327,7 @@ public class Field : MonoBehaviour
 
                         if (isMergiable(_currentCellIndex, _previousCellIndex, _cells) == true)
                         {
-                            Merge(_signDirection, _previousCellIndex, _currentCellIndex, ref _cells);
+                            MergeTiles(_signDirection, _previousCellIndex, _currentCellIndex, ref _cells);
                             _previousCellIndex = -1;
                             _isMoved = true;
                         }
@@ -378,35 +350,44 @@ public class Field : MonoBehaviour
             }
             //TODO: работа с линией с помощью измененных функций merge, move и т.д.
         }
+        MoveResult(_isMoved);
+    }
 
+    private async void MoveResult(bool _isMoved)
+    {
+        await UniTask.WhenAll(_accumulatedMoves);
+        Merge();
         //Если произошло движение
         if (_isMoved)
         {
-            //После смещения всех плиток появляется новая плитка
-            CreateTile();
-
+            //Если сумма номиналов объединенных плиток > 0 (т.е. были объединенные плитки в этой ходу)
             if (mergingSummary > 0)
             {
+                await UniTask.Delay(150);
                 InGameUI.instance.IncreaseScore(mergingSummary);
             }
 
+            //После смещения всех плиток появляется новая плитка
+            CreateTile();
+            await UniTask.Delay(150);
             SaveField();
 
             //TODO: узнать есть ли какой-то ход для того, чтобы "разрулить" ситуацию
-            if (tilesCount >= GameEnvironment.cellCount * GameEnvironment.cellCount && isExistNextMove() == false)
+            if (tilesCount >= cellCount * cellCount && isExistNextMove() == false)
             {
-                PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} exists", 0);
-                InGameUI.instance.GameOver();
+                PlayerPrefs.SetInt($"GameMode {cellCount} exists", 0);
+                InGameUI.instance.EndGame();
             }
-
+            
             InGameUI.instance.InteractBackArrow();
         }
+        finishMove?.Invoke();
     }
 
-    private Cell[] GetLane(int _k, Vector2Int direction)
+    private Cell[] GetCellsInRow(int _k, Vector2Int direction)
     {
-        Cell[] _cells = new Cell[GameEnvironment.cellCount];
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        Cell[] _cells = new Cell[cellCount];
+        for (int i = 0; i < cellCount; i++)
         {
             if (direction.x != 0)
             {
@@ -426,77 +407,48 @@ public class Field : MonoBehaviour
         int _currentPosition = i;
         int _nextposition = i + _direction;
 
-        while (_nextposition >= 0 && _nextposition <= (GameEnvironment.cellCount - 1) && _cells[_nextposition].isFree())
+        while (_nextposition >= 0 && _nextposition <= (cellCount - 1) && _cells[_nextposition].isFree())
         {
             _currentPosition = _nextposition;
             _nextposition = _nextposition + _direction;
         }
 
         return _currentPosition;
-    }
-
-    private Vector2Int GetAvailablePosition(Vector2Int _tilePosition, Vector2Int _direction)
-    {
-        Vector2Int _currentPosition = _tilePosition;
-        Vector2Int _nextposition = _tilePosition + _direction;
-        Cell _nextCell = field[_nextposition.x, _nextposition.y];
-
-        while (_nextCell.isFree())
-        {
-            _currentPosition = _nextposition;
-            _nextposition = _nextposition + _direction;
-            _nextCell = field[_nextposition.x, _nextposition.y];
-        }
-
-        return _currentPosition;
-    }
-
-    private bool isMergiable(Cell _fromCell, Cell _toCell)
-    {
-        if (_fromCell.tile.value == _toCell.tile.value)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 
     private bool isMergiable(int _from, int _to, Cell[] _cells)
     {
-        if (_cells[_from].tile.value == _cells[_to].tile.value)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return _cells[_from].tile.value == _cells[_to].tile.value;
     }
 
     //                     направление   сливаемое  сливаемый             клетки
-    private void Merge(int _direction, int _merged, int _mergeable, ref Cell[] _cells)
+    private void MergeTiles(int _direction, int _merged, int _mergeable, ref Cell[] _cells)
     {
         //2 плитки перемещаются в 1
-        int _availablePosition1 = GetAvailablePosition(_direction, _merged, ref _cells);
-        int _to = _availablePosition1;
+        int _to = GetAvailablePosition(_direction, _merged, ref _cells);
+        
         Tile _mergedTile = _cells[_merged].tile;
         Tile _mergeableTile = _cells[_mergeable].tile;
+        mergingTiles.Add((_mergedTile, _mergeableTile));
 
-        _mergedTile.gameObject.transform.SetParent(_cells[_to].transform);
-        _mergeableTile.gameObject.transform.SetParent(_cells[_to].transform);
+        MoveTile(_merged, _to, ref _cells);
+        MoveTile(_mergeable, _to, ref _cells);
+    }
 
-        _cells[_merged].Clear();
-        _cells[_mergeable].Clear();
+    private void Merge()
+    {
+        foreach(var (tile1, tile2) in mergingTiles)
+        {
+            int _doubleValue = tile1.value * 2;
+            field[tile1.position.x, tile1.position.y].tile = null;
+            CreateTile(tile1.position, _doubleValue);
+            Destroy(tile1.gameObject);
+            Destroy(tile2.gameObject);
+            tilesCount -= 2;
+            mergingSummary += _doubleValue;
+        }
 
-        int _doubleValue = _mergedTile.value * 2;
-        mergingSummary += _doubleValue;
-        CreateTile(_cells[_to].position, _doubleValue);
-
-        _mergedTile.Merge();
-        _mergeableTile.Merge();
-        tilesCount -= 2;
+        mergingTiles.Clear();
     }
 
     private void MoveTile(int _from, int _to, ref Cell[] _cells)
@@ -504,16 +456,17 @@ public class Field : MonoBehaviour
         Tile movingCellTile = _cells[_from].tile;
         _cells[_to].tile = movingCellTile;
         movingCellTile.gameObject.transform.SetParent(_cells[_to].transform);
-        movingCellTile.Set(_cells[_to].position);
+        var task = movingCellTile.Set(_cells[_to].position);
+        _accumulatedMoves.Add(task);
         _cells[_from].Clear();
         //TODO: Заменить данную строку на другую функцию, выполняющую планое перемещение всех клеток одновременно
     }
 
-    private int MoveTileToAvailableCell(int _direction, int i, Cell[] _cells)
+    private int MoveTileToAvailableCell(int _direction, int _currentPosition, Cell[] _cells)
     {
-        int _availablePosition = GetAvailablePosition(_direction, i, ref _cells);
-        if (i != _availablePosition)
-            MoveTile(i, _availablePosition, ref _cells);
+        int _availablePosition = GetAvailablePosition(_direction, _currentPosition, ref _cells);
+        if (_currentPosition != _availablePosition)
+            MoveTile(_currentPosition, _availablePosition, ref _cells);
         
         return _availablePosition;
     }
@@ -522,7 +475,7 @@ public class Field : MonoBehaviour
     {
         int _previousCellIndex = -1;
 
-        for (int j = 0; j < GameEnvironment.cellCount; j++)
+        for (int j = 0; j < cellCount; j++)
         {
             if (_previousCellIndex == -1 && _lane[j].isFree() == false)
             {
@@ -552,10 +505,10 @@ public class Field : MonoBehaviour
         Cell[] verticalLane;
         Cell[] horizontalLane;
 
-        for (int i = 0; i < GameEnvironment.cellCount; i++)
+        for (int i = 0; i < cellCount; i++)
         {
-            verticalLane = GetLane(i, new Vector2Int(0, 1));
-            horizontalLane = GetLane(i, new Vector2Int(1, 0));
+            verticalLane = GetCellsInRow(i, new Vector2Int(0, 1));
+            horizontalLane = GetCellsInRow(i, new Vector2Int(1, 0));
 
             if (hasMergiableTilesInLane(verticalLane) || hasMergiableTilesInLane(horizontalLane))
                 return true;
@@ -566,6 +519,8 @@ public class Field : MonoBehaviour
 
     private void Awake()
     {
+        cellCount = 4;
+        
         if (instance == null)
         {
             instance = this;
@@ -577,18 +532,24 @@ public class Field : MonoBehaviour
         }
     }
 
-    public void increaseReady()
+    //Настройка размеров поля и настройка камеры
+    private void SetMapping()
     {
-        tilesReadyCount++;
-        if (tilesReadyCount == tilesCount)
-        {
-            //Запустить следующий этап, либо закончить этот в Task'е
-        }
+        transformCellSize = 2;
+        indention = transformCellSize / 8;
+        transformFieldsize = (transformCellSize * cellCount + indention * (cellCount + 1)) / 2;
+        centering = transformFieldsize - transformCellSize / 2 - indention;
+
+        Field.instance.gameObject.transform.localScale = new Vector3(transformFieldsize, transformFieldsize);
+
+        Camera.main.orthographicSize = cameraToField * cellCount;
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        cellCount = 4;
+        SetMapping();
         SetField();
     }
 

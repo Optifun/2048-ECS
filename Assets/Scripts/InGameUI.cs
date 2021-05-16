@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Theme
+{
+    light = 0,
+    dark = 1,
+}
+
 public class InGameUI : MonoBehaviour
 {
     public static InGameUI instance;
 
     public Text scoreText;
-    //TODO: Перенести в днугой класс
     public int scoreAmount { get; private set; }
+    private int previousTurnScoreAmount;
     public Text bestText;
     public int bestAmount { get; private set; }
     public GameObject popupTextPrefab;
@@ -19,10 +25,17 @@ public class InGameUI : MonoBehaviour
     public Button DecreaseCellCountButton;
     public Button IncreaseCellCountButton;
     public Button ThemeButton;
+
+    //Текущая тема
+    public Theme theme;
+
+    //Спрайты иконок для кнопки смены темы
     public Sprite light;
     public Sprite dark;
 
-    private int cellCount = 4;
+    //Цвета заднего фона
+    public Color lightBackground; //FAE6D2
+    public Color darkBackground; //242830
 
     Animator panelAnimator;
     Animator scoreAnimator;
@@ -42,25 +55,26 @@ public class InGameUI : MonoBehaviour
 
     public void IncreaseScore(int _amount)
     {
+        previousTurnScoreAmount = scoreAmount;
         scoreAmount += _amount;
         scoreText.text = scoreAmount.ToString();
 
         SpawnPopUpText(_amount);
 
-        PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Score", scoreAmount);
+        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", scoreAmount);
         PlayerPrefs.Save();
 
         BackArrow.interactable = true;
     }
 
-    public void GameOver()
+    public void EndGame()
     {
         panel.SetActive(true);
         if (bestAmount < scoreAmount)
         {
             bestAmount = scoreAmount;
             bestText.text = bestAmount.ToString();
-            PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Best", bestAmount);
+            PlayerPrefs.SetInt($"GameMode {Field.cellCount} Best", bestAmount);
             PlayerPrefs.Save();
         }
         //TODO: transition
@@ -69,7 +83,7 @@ public class InGameUI : MonoBehaviour
     public void Retry()
     {
         ResetUI();
-        StartNewGame();
+        StartGame();
         Field.instance.ResetGame();
         panel.SetActive(false);
 
@@ -79,13 +93,13 @@ public class InGameUI : MonoBehaviour
     public void ResetUI()
     {
         scoreAmount = 0;
-        PlayerPrefs.SetInt($"GameMode {GameEnvironment.cellCount} Score", 0);
+        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", 0);
         scoreText.text = scoreAmount.ToString();
     }
 
-    public void StartNewGame()
+    public void StartGame()
     {
-        int amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} Best");
+        int amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Best");
         if (amount > 0)
         {
             bestAmount = amount;
@@ -93,11 +107,10 @@ public class InGameUI : MonoBehaviour
         else
         {
             bestAmount = 0;
-
         }
         bestText.text = bestAmount.ToString();
 
-        amount = PlayerPrefs.GetInt($"GameMode {GameEnvironment.cellCount} Score");
+        amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Score");
         if (amount > 0)
         {
             scoreAmount = amount;
@@ -108,12 +121,14 @@ public class InGameUI : MonoBehaviour
         }
         scoreText.text = scoreAmount.ToString();
 
+        theme = (Theme)PlayerPrefs.GetInt("Game theme");
+
         BackArrow.interactable = false;
     }
 
     public void ChangeTheme()
     {
-        if (GameEnvironment.instance.theme == Theme.dark)
+        if (theme == Theme.dark)
         {
             ThemeButton.image.sprite = dark;
         }
@@ -122,7 +137,19 @@ public class InGameUI : MonoBehaviour
             ThemeButton.image.sprite = light;
         }
 
-        GameEnvironment.instance.ChangeTheme();
+        if (theme == Theme.light)
+        {
+            Camera.main.backgroundColor = darkBackground;
+            theme = Theme.dark;
+        }
+        else
+        {
+            Camera.main.backgroundColor = lightBackground;
+            theme = Theme.light;
+        }
+
+        PlayerPrefs.SetInt("Game theme", (int)theme);
+        Field.instance.SetTheme(theme);
     }
 
     public void IncreaseCellCount()
@@ -139,10 +166,10 @@ public class InGameUI : MonoBehaviour
 
     public void ChangeField(int _sign)
     {
-        cellCount += _sign;
+        int cellCount = Field.cellCount + _sign;
         fieldNameText.text = $"{cellCount}x{cellCount}";
-        GameEnvironment.instance.SetFieldSize(_sign);
-        StartNewGame();
+        Field.instance.SetFieldSize(_sign);
+        StartGame();
 
         if (cellCount >= 6)
         {
@@ -162,7 +189,8 @@ public class InGameUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartNewGame();
+        DecreaseCellCountButton.interactable = false;
+        StartGame();
     }
 
     public void SpawnPopUpText(int _amount)
@@ -175,6 +203,7 @@ public class InGameUI : MonoBehaviour
 
     public void ReturnToLastTurn()
     {
+        IncreaseScore(previousTurnScoreAmount - scoreAmount);
         Field.instance.ReturnToLastTurn();
         BackArrow.interactable = false;
     }
