@@ -9,9 +9,9 @@ public enum Theme
     dark = 1,
 }
 
-public class InGameUI : MonoBehaviour
+public class UserInterface : MonoBehaviour
 {
-    public static InGameUI instance;
+    public static UserInterface instance;
 
     public Text scoreText;
     public int scoreAmount { get; private set; }
@@ -53,6 +53,7 @@ public class InGameUI : MonoBehaviour
         }
     }
 
+    //Функция позволяет увеличить игровой счёт на значение _amount
     public void IncreaseScore(int _amount)
     {
         previousTurnScoreAmount = scoreAmount;
@@ -67,9 +68,12 @@ public class InGameUI : MonoBehaviour
         BackArrow.interactable = true;
     }
 
+    //Функция отображает панель конца игры
     public void EndGame()
     {
         panel.SetActive(true);
+
+        //Если лучший счёт меньше игрового, то происходит присваивание значения нового лучшего счёта
         if (bestAmount < scoreAmount)
         {
             bestAmount = scoreAmount;
@@ -77,28 +81,32 @@ public class InGameUI : MonoBehaviour
             PlayerPrefs.SetInt($"GameMode {Field.cellCount} Best", bestAmount);
             PlayerPrefs.Save();
         }
-        //TODO: transition
+
+        //Сбрасывается значение игрового счета
+        PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", 0);
     }
 
+    //Функция позволяет начать новую игру
     public void Retry()
     {
-        ResetUI();
+        ResetScore();
         StartGame();
-        Field.instance.ResetGame();
+        Field.instance.ResetField();
         panel.SetActive(false);
-
-        //TODO: retry
     }
 
-    public void ResetUI()
+    //Функция сбрасывает значение игрового счёта
+    public void ResetScore()
     {
         scoreAmount = 0;
         PlayerPrefs.SetInt($"GameMode {Field.cellCount} Score", 0);
         scoreText.text = scoreAmount.ToString();
     }
 
+    //Функция отвечает за начало игры
     public void StartGame()
     {
+        //Происходит подгрузка значения текущего счета, лучшего счёта и текущей темы оформления
         int amount = PlayerPrefs.GetInt($"GameMode {Field.cellCount} Best");
         if (amount > 0)
         {
@@ -122,10 +130,21 @@ public class InGameUI : MonoBehaviour
         scoreText.text = scoreAmount.ToString();
 
         theme = (Theme)PlayerPrefs.GetInt("Game theme");
+        if (theme == Theme.light)
+        {
+            ThemeButton.image.sprite = dark;
+            Camera.main.backgroundColor = lightBackground;
+        }
+        else
+        {
+            ThemeButton.image.sprite = light;
+            Camera.main.backgroundColor = darkBackground;
+        }
 
         BackArrow.interactable = false;
     }
 
+    //Функция меняет текущую тему
     public void ChangeTheme()
     {
         if (theme == Theme.dark)
@@ -152,25 +171,28 @@ public class InGameUI : MonoBehaviour
         Field.instance.SetTheme(theme);
     }
 
+    //Функция увеличивает количество клеток на 1
     public void IncreaseCellCount()
     {
         ChangeField(1);
-        //Invoke GameEnvironment (там увеличивается кол-во клеток в поле и загружается новое поле)
     }
 
+    //Функция уменьшает количество клеток на 1
     public void DecreaseCellCount()
     {
         ChangeField(-1);
-        //Invoke GameEnvironment (там увеличивается кол-во клеток в поле и загружается новое поле)
     }
 
+    //Функция изменяет количество клеток на поле
     public void ChangeField(int _sign)
     {
         int cellCount = Field.cellCount + _sign;
         fieldNameText.text = $"{cellCount}x{cellCount}";
+
         Field.instance.SetFieldSize(_sign);
         StartGame();
 
+        //Если количество клеток достигло предельных значений, то соответствующие кнопки становятся неинтерактивными
         if (cellCount >= 6)
         {
             IncreaseCellCountButton.interactable = false;
@@ -193,14 +215,16 @@ public class InGameUI : MonoBehaviour
         StartGame();
     }
 
+    //Функция позволяет создать всплывающий текст со значением _amount
     public void SpawnPopUpText(int _amount)
     {
-        PopUp _popUpText = Instantiate(popupTextPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)).GetComponent<PopUp>();
+        PopUpText _popUpText = Instantiate(popupTextPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)).GetComponent<PopUpText>();
         _popUpText.gameObject.transform.SetParent(scoreText.gameObject.transform);
         _popUpText.gameObject.transform.localPosition = new Vector3(25f, 9.5f);
         _popUpText.Initialize(_amount);
     }
 
+    //Функция возвращает значение игрового счёта, соответствующее прошлому ходу. Также вызывается функция из класса Игровое Поле, которая возвращает прежние места плиток
     public void ReturnToLastTurn()
     {
         IncreaseScore(previousTurnScoreAmount - scoreAmount);
@@ -208,19 +232,15 @@ public class InGameUI : MonoBehaviour
         BackArrow.interactable = false;
     }
 
+    //Функция позволяет сделать кнопку Шаг назад интерактивной
     public void InteractBackArrow()
     {
         BackArrow.interactable = true;
     }
 
+    //Функция позволяет закрыть окно игры
     public void CloseGame()
     {
         Application.Quit();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

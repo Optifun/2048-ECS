@@ -5,8 +5,10 @@ using UnityEngine;
 public class Cell : MonoBehaviour
 {
     public Tile tile { get; set; }
+    //Позиция клетки. Совпадает с индексами клетки в двумерном массиве поля
     public Vector2Int position { get; private set; }
 
+    //Функция позволяет задать позицию клетки
     public void Initialize(Vector2Int _position)
     {
         tile = null;
@@ -14,6 +16,7 @@ public class Cell : MonoBehaviour
         this.gameObject.name = $"Cell ({position.x},{position.y})";
     }
 
+    //Функция позволяет узнать то, есть ли у клетки плитка
     public bool isFree()
     {
         if (tile == null)
@@ -26,20 +29,9 @@ public class Cell : MonoBehaviour
         }
     }
 
+    //Функция позволяет очистить клетку от плитки
     public void Clear()
     {
         tile = null;
-    }
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

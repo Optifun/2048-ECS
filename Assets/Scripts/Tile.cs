@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,12 +9,15 @@ using Random = UnityEngine.Random;
 
 public class Tile : MonoBehaviour
 {
+    //Значение плитки, её номинал
     public int value { get; private set; }
+    //Позиция плитки. Совпадает с индесом клетки в двумерном массиве поля
     public Vector2Int position { get; private set; }
-
+   
     public Text numberText;
     public SpriteRenderer sprite;
 
+    //Палитра цветов для плитки для светлой и темной тем
     public Color[] lightColorPallete = new Color[13];
     public Color[] darkColorPallete = new Color[13];
     private Color textColor;
@@ -21,8 +25,13 @@ public class Tile : MonoBehaviour
 
     public Animator animator;
 
+    public float moveDuration = 0.01f;
+    public float spawnDuration = 0.3f;
+
+    //Функция позволяет указать позицию плитки и текущую тему
     public void Initialize(Vector2Int _position, Theme _theme)
     {
+        //Для плитки подбирается значение номинала. Значение 2 либо 4
         int randNum = Random.Range(0, 10);
         if (randNum == 9)
             value = 4;
@@ -32,9 +41,13 @@ public class Tile : MonoBehaviour
         position = _position;
 
         SetAppearance(_theme);
-        animator.SetInteger("state", 1);
+        //Запускается анимация появления плитки
+        //animator.SetInteger("state", 1);
+        transform.localScale = new Vector3(0, 0, 1);
+        transform.DOScale(new Vector2(1f, 1f), spawnDuration);
     }
 
+    //Функция позволяет указать значение и позицию плитки, а также текущую тему
     public void Initialize(int _value, Vector2Int _position, Theme _theme)
     {
         value = _value;
@@ -42,15 +55,26 @@ public class Tile : MonoBehaviour
         position = _position;
 
         SetAppearance(_theme);
-        animator.SetInteger("state", 2);
+        //Запускается анимация появления плитки после объединения
+        //animator.SetInteger("state", 2);
+        transform.DOPunchScale(new Vector2(0.2f, 0.2f), spawnDuration * 1.5f, 1, 1);
     }
 
-    public UniTask Set(Vector2Int _position)
+    //Функция позволяет запустить корутину перемещения и вернуть значение типа UniTask, которая позволяет отслеживать состояние корутины
+    public UniTask Move(Cell _cell)
     {
-        position = _position;
-        return Moving().ToUniTask(this);
+        position = _cell.position;
+
+        return Moving(_cell.transform.position).ToUniTask(this);
     }
 
+    //Функция позволяет запустить корутину перемещения и вернуть значение типа UniTask, которая позволяет отслеживать состояние корутины
+    public UniTask Merge(Cell _cell)
+    {
+        return Merging(_cell.transform.position).ToUniTask(this);
+    }
+
+    //Изменяет внешний облик плитки, соответствующий текущей теме
     public void SetAppearance(Theme _theme)
     {
         int powerNum = (int)Mathf.Log(value, 2);
@@ -70,13 +94,14 @@ public class Tile : MonoBehaviour
                 spriteColor = lightColorPallete[lightColorPallete.Length - 1];
         }
 
+        //Определение цвета текста. Он зависит от оттенка серого принятого цвета плитки
         if (spriteColor.grayscale > 0.735f)
         {
-            textColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+            textColor = new Color(0.2f, 0.2f, 0.2f, 1);
         }
         else
         {
-            textColor = new Color(1, 1, 1, 0.3f);
+            textColor = new Color(1, 1, 1, 1);
         }
 
         sprite.color = spriteColor;
@@ -84,30 +109,19 @@ public class Tile : MonoBehaviour
         numberText.text = value.ToString();
     }
 
-    public IEnumerator Moving()
+    //Корутина передвижения плитки
+    public IEnumerator Moving(Vector2 _position)
     {
-        float _startMagnitude = Mathf.Abs(gameObject.transform.localPosition.magnitude);
-        float _currentMagnitude = _startMagnitude;
-
-        while (_startMagnitude / 10 < _currentMagnitude)
-        {
-            gameObject.transform.localPosition = Vector2.Lerp(gameObject.transform.localPosition, Vector2.zero, Time.fixedDeltaTime * 17);
-            _currentMagnitude = Mathf.Abs(gameObject.transform.localPosition.magnitude);
-            yield return new WaitForSeconds(0.01f);
-        }
-
-        gameObject.transform.localPosition = new Vector3(0, 0, -1);
+        transform.DOMove(_position, moveDuration);
+        yield return new WaitForSeconds(moveDuration);
     }
 
-    // Start is called before the first frame update
-    void Start()
+    //Корутина объединения плитки
+    public IEnumerator Merging(Vector2 _position)
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        numberText.transform.DOScale(new Vector2(0, 0), moveDuration);
+        transform.DOMove(_position, moveDuration);
+        yield return new WaitForSeconds(moveDuration);
+        Destroy(this.gameObject);
     }
 }

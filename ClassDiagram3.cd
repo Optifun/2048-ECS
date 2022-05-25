@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="ActionsManager">
+    <Position X="13.75" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAKAAAEAQAAAAAAAAAAAAAQAAEIMgAAQhFCA=</HashCode>
+      <FileName>Assets\Scripts\ActionManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Cell">
+    <Position X="7.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAQAAAAAAIAAAAAAAAAAAAAAAAAhAAAA=</HashCode>
+      <FileName>Assets\Scripts\Cell.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="tile" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Field">
+    <Position X="10.75" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>QRCAAAABESECAAwAAAgAARYAFAFgAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\Field.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="field" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="GameControls">
+    <Position X="4" Y="3" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAKAAgAIAIAACCSgAAAQAAAAAAAAAAAAABAg=</HashCode>
+      <FileName>Assets\Scripts\GameControls.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PopUpText">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\PopUpText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Tile">
+    <Position X="7.5" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAIAAAQAAAAAAKCAAABIigCAAAAAAAAAAIAA=</HashCode>
+      <FileName>Assets\Scripts\Tile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UserInterface">
+    <Position X="0.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>ABABAAAAIrAgAQBCAUQAmAAgIAJAABAhABAoQQAQAEA=</HashCode>
+      <FileName>Assets\Scripts\UserInterface.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="theme" />
+    </ShowAsAssociation>
+  </Class>
+  <Enum Name="ResetFieldType">
+    <Position X="4" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Field.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Theme">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\UserInterface.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
