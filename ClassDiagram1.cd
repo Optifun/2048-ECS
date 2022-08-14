@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Assets.Scripts.Calculations" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Calculations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Cell" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQBAAAAACAAAQAAAAAAIAAAAAAAAAAAAAAAAAhAAAA=</HashCode>
+      <FileName>Assets\Scripts\Cell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Field">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EBSAAAgAAbAKEFkABAgAAJIAECFgAQAAEIEgAAQgFGE=</HashCode>
+      <FileName>Assets\Scripts\Field.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GameEnvironment" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQQAAAABMLEQAAUIACAIAAQABABAAAAAABAIAAAAAEE=</HashCode>
+      <FileName>Assets\Scripts\GameEnvironment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InGameUI" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ARQBgAAAAqAiAQBCAUQAmAAgAAJAABAhABAgQQAAAEA=</HashCode>
+      <FileName>Assets\Scripts\InGameUI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerInputs" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQEAAAAACAAgAAAIAACCCiAAAQAAAQAoAAAAAACBAg=</HashCode>
+      <FileName>Assets\Scripts\PlayerInputs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PopUp" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\PopUp.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Tile">
+    <Position X="9.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAQAAAAAACAADQAAAAAAKCAAABIigSAAAAAAAAAAIgA=</HashCode>
+      <FileName>Assets\Scripts\Tile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Visualizer" Collapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Visualizer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="ResetFieldType" Collapsed="true">
+    <Position X="0.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Field.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Theme" Collapsed="true">
+    <Position X="2.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameEnvironment.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

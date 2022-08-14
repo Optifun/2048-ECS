@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: +2
+  m_Text: 
 --- !u!95 &8976523322203031833
 Animator:
   serializedVersion: 3
